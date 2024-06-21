@@ -1,0 +1,7 @@
+{
+  "hello": {
+    "prefix": "hello",
+    "body": ["printf('Hello, World!')"],
+    "description": "print Hello, World!"
+  },
+}

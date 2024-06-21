@@ -1,0 +1,7 @@
+{
+  "hello": {
+    "prefix": "hello",
+    "body": ["console.log('Hello, World!')"],
+    "description": "print Hello, World!"
+  },
+}

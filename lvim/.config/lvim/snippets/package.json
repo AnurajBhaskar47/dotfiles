@@ -1,0 +1,23 @@
+{
+  "name": "nvim-snippets",
+  "author": "AJ-47",
+  "engines": {
+    "vscode": "^1.11.0"
+  },
+  "contributes": {
+    "snippets": [
+      {
+        "language": "python",
+        "path": "./python.json"
+      },
+      {
+        "language": "javascript",
+        "path": "./javascript.json"
+      },
+      {
+        "language": "cpp",
+        "path": "./cpp.json"
+      },
+    ]
+  }
+}
