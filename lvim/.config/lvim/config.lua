@@ -44,40 +44,40 @@ lvim.builtin.which_key.mappings["rc"] = { ":RunClose<CR>", "Run Close" }
 -- lvim.builtin.which_key.mappings["crp"] = { ":CRProjects<CR>", "CR Projects" }
 
 -- Plugins
--- lvim.plugins = {
---    -- Cmake-tools␍
---     {
---         "Civitasv/cmake-tools.nvim"
---     },
---     -- CodeRunner␍
---     {
---         "CRAG666/code_runner.nvim",
---         config = true,
---         requires = { "nvim-lua/plenary.nvim" },
---     },
+lvim.plugins = {
+    -- Cmake-tools␍
+    {
+        "Civitasv/cmake-tools.nvim"
+    },
+    -- CodeRunner␍
+    {
+        "CRAG666/code_runner.nvim",
+        config = true,
+        requires = { "nvim-lua/plenary.nvim" },
+    },
 
---     -- Markdown-preview␍
---     {
---         "davidgranstrom/nvim-markdown-preview"
---     },
---     -- UltiSnips␍
---     -- {
---     --   "sirver/ultisnips",␍
---     -- },
---     {
---         "simrat39/rust-tools.nvim",
---         ft = "rust",
---         dependencies = "neovim/nvim-lspconfig",
---         -- opts = function ()
---         --   return require "custom.configs.rust-tools"␍
---         -- end,
---     },
---     { "mfussenegger/nvim-dap-python" },
---     { "nvim-neotest/nvim-nio" },
---     { "nvim-neotest/neotest" },
---     { "nvim-neotest/neotest-python" },
+    -- Markdown-preview␍
+    {
+        "davidgranstrom/nvim-markdown-preview"
+    },
+    -- UltiSnips␍
+    -- {
+    --   "sirver/ultisnips",␍
+    -- },
+    {
+        "simrat39/rust-tools.nvim",
+        ft = "rust",
+        dependencies = "neovim/nvim-lspconfig",
+        -- opts = function ()
+        --   return require "custom.configs.rust-tools"␍
+        -- end,
+    },
+    { "mfussenegger/nvim-dap-python" },
+    { "nvim-neotest/nvim-nio" },
+    { "nvim-neotest/neotest" },
+    { "nvim-neotest/neotest-python" },
 
--- }
+}
 
 
 -- Debug Adapter Protocol
