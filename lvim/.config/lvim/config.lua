@@ -53,7 +53,7 @@ lvim.plugins = {
     {
         "CRAG666/code_runner.nvim",
         config = true,
-        requires = { "nvim-lua/plenary.nvim" },
+        dependencies = { "nvim-lua/plenary.nvim" },
     },
 
     -- Markdown-preview␍
