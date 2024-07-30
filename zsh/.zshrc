@@ -92,7 +92,7 @@ eval "$(zoxide init zsh)"
 eval $(thefuck --alias)
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 
 # Export paths
@@ -105,6 +105,8 @@ source ~/.custom_commands.sh
 
 # Set up fzf key binding
 source <(fzf --zsh)
+bindkey -r '^T'
+bindkey '^F' fzf-file-widget
 
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
