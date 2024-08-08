@@ -133,8 +133,8 @@ ForegroundPositive=39,174,96
 ForegroundVisited=155,89,182
 
 [DirSelect Dialog]
-DirSelectDialog Size=833,561
-History Items[$e]=file:$HOME/Videos
+DirSelectDialog Size=1006,599
+History Items[$e]=file:$HOME/Dev,file:$HOME/Videos
 
 [General]
 ColorSchemeHash=4a48bd34ba53d580d8594cb0216221e77518509f
@@ -173,6 +173,8 @@ Dialog Size=599,479
 activeBackground=49,54,59
 activeBlend=252,252,252
 activeForeground=252,252,252
+frame=61,174,233
 inactiveBackground=42,46,50
 inactiveBlend=161,169,177
 inactiveForeground=161,169,177
+inactiveFrame=239,240,241
