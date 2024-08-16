@@ -88,6 +88,7 @@ alias ssh='kitten ssh'
 alias zshconfig='lvim ~/.zshrc'
 alias src='source ~/.zshrc'
 alias vim='lvim'
+alias cat='bat'
 eval "$(zoxide init zsh)"
 eval $(thefuck --alias)
 
