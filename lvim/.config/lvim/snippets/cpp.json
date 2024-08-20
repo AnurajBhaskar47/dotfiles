@@ -1,7 +1,11 @@
 {
-  "hello": {
-    "prefix": "hello",
-    "body": ["printf('Hello, World!')"],
-    "description": "print Hello, World!"
+  "main": {
+    "prefix": "main",
+    "body": ["#include<bits/stdc++.h>",
+             "using namespace std;",
+             " ",
+             "int main() {",
+             "}"],
+    "description": "main loop"
   },
 }
