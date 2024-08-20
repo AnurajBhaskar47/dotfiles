@@ -36,7 +36,8 @@ require('code_runner').setup({
         java = {
             "cd $dir &&",
             "javac $fileName &&",
-            "java $fileNameWithoutExt",
+            "java $fileNameWithoutExt &&",
+            "rm $dir/$fileNameWithoutExt.class"
         },
         python = "python3 -u",
         cpp =
