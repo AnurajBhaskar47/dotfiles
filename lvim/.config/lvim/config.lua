@@ -1,4 +1,5 @@
 -- Read the docs: https://www.lunarvim.org/docs/configuration
+-- Example configs: https://github.com/LunarVim/starter.lvim
 -- Video Tutorials: https://www.youtube.com/watch?v=sFA9kX-Ud_c&list=PLhoH5vyxr6QqGu0i7tt_XoVK9v-KvZ3m6
 -- Forum: https://www.reddit.com/r/lunarvim/
 -- Discord: https://discord.com/invite/Xb9B4Ny
@@ -20,13 +21,15 @@ vim.keymap.set("i", "<C-BS>", "<C-w>")
 
 -- Lvim_keybindings
 lvim.keys.insert_mode["<S-Tab>"] = "<C-d>"
-lvim.keys.normal_mode["o"] = "o<esc>"
-lvim.keys.normal_mode["O"] = "O<esc>"
+-- lvim.keys.normal_mode["o"] = "o<esc>"
+-- lvim.keys.normal_mode["O"] = "O<esc>"
 lvim.keys.normal_mode["Y"] = "Vy"
 lvim.keys.normal_mode["<Esc>"] = ":nohl<cr>"
 lvim.keys.normal_mode["<C-m>"] = ":MarkdownPreview<cr>"
 lvim.keys.normal_mode["<A-n>"] = ":RunCode<cr>:startinsert <cr>" -- Code-Runner
 lvim.keys.normal_mode["<C-a>"] = "ggVG"
+lvim.keys.normal_mode["<C-s>"] = ":SessionSearch<CR>"            --Session search
+
 lvim.builtin.terminal.execs = {
     { nil, "<C-`>", "Horizontal Terminal", "horizontal", 0.3 },
     { nil, "<C-.>", "Vertical Terminal",   "vertical",   0.4 },
@@ -56,14 +59,35 @@ lvim.plugins = {
         dependencies = { "nvim-lua/plenary.nvim" },
     },
 
-    -- Markdown-preview␍
+    -- Render-Markdown
     {
-        "davidgranstrom/nvim-markdown-preview"
+        'MeanderingProgrammer/render-markdown.nvim',
+        opts = {},
+        dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' }, -- if you use the mini.nvim suite
+        -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
+        -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
     },
-    -- UltiSnips␍
-    -- {
-    --   "sirver/ultisnips",␍
-    -- },
+    {
+        'rmagatti/auto-session',
+        lazy = false,
+        dependencies = {
+            'nvim-telescope/telescope.nvim', -- Only needed if you want to use session lens
+        },
+        keys = {
+            -- Will use Telescope if installed or a vim.ui.select picker otherwise
+            { '<leader>wr', '<cmd>SessionSearch<CR>',         desc = 'Session search' },
+            { '<leader>ws', '<cmd>SessionSave<CR>',           desc = 'Save session' },
+            { '<leader>wa', '<cmd>SessionToggleAutoSave<CR>', desc = 'Toggle autosave' },
+        },
+
+        ---enables autocomplete for opts
+        ---@module "auto-session"
+        ---@type AutoSession.Config
+        opts = {
+            suppressed_dirs = { '~/', '~/Projects', '~/Downloads', '/' },
+            -- log_level = 'debug',
+        }
+    },
     {
         "simrat39/rust-tools.nvim",
         ft = "rust",
