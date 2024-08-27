@@ -25,7 +25,6 @@ lvim.keys.insert_mode["<S-Tab>"] = "<C-d>"
 -- lvim.keys.normal_mode["O"] = "O<esc>"
 lvim.keys.normal_mode["Y"] = "Vy"
 lvim.keys.normal_mode["<Esc>"] = ":nohl<cr>"
-lvim.keys.normal_mode["<C-m>"] = ":MarkdownPreview<cr>"
 lvim.keys.normal_mode["<A-n>"] = ":RunCode<cr>:startinsert <cr>" -- Code-Runner
 lvim.keys.normal_mode["<C-a>"] = "ggVG"
 lvim.keys.normal_mode["<C-s>"] = ":SessionSearch<CR>"            --Session search
