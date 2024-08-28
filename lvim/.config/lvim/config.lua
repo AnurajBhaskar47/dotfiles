@@ -91,7 +91,7 @@ lvim.plugins = {
         }
     },
 
-    -- Leetcode-nvim
+    -- Leetcode.nvim
     {
         "kawre/leetcode.nvim",
         build = ":TSUpdate html",
@@ -114,7 +114,7 @@ lvim.plugins = {
         },
     },
 
-    -- Image-nvim
+    -- Luarocks.nvim
     {
         "vhyrro/luarocks.nvim",
         priority = 1001, -- this plugin needs to run before anything else
@@ -122,6 +122,8 @@ lvim.plugins = {
             rocks = { "magick" },
         },
     },
+    
+    -- Image.nvim
     {
         "3rd/image.nvim",
         dependencies = { "luarocks.nvim" },
@@ -133,8 +135,6 @@ lvim.plugins = {
             })
         end
     },
-
-
 
     -- Rust-tools
     {
@@ -152,6 +152,10 @@ lvim.plugins = {
 
 }
 
+-- Tokyonight-markdown
+require('tokyonight').setup({
+    plugins = { markdown = true },
+})
 
 -- Debug Adapter Protocol
 lvim.builtin.dap.active = true
