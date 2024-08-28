@@ -7,7 +7,7 @@
 
 -- Formatting
 lvim.format_on_save.enabled = true
-lvim.format_on_save.pattern = { "*.lua", "*.py", "*.cpp", "*.rs" }
+lvim.format_on_save.pattern = { "*.lua", "*.cpp", "*.rs" }
 -- lvim.transparent_window = true
 
 vim.opt.shiftwidth = 4
@@ -47,11 +47,11 @@ lvim.builtin.which_key.mappings["rc"] = { ":RunClose<CR>", "Run Close" }
 
 -- Plugins
 lvim.plugins = {
-    -- Cmake-tools␍
+    -- Cmake-tools
     {
         "Civitasv/cmake-tools.nvim"
     },
-    -- CodeRunner␍
+    -- CodeRunner
     {
         "CRAG666/code_runner.nvim",
         config = true,
@@ -66,6 +66,9 @@ lvim.plugins = {
         -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
         -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
     },
+
+
+    -- Auto-Session
     {
         'rmagatti/auto-session',
         lazy = false,
@@ -83,10 +86,57 @@ lvim.plugins = {
         ---@module "auto-session"
         ---@type AutoSession.Config
         opts = {
-            suppressed_dirs = { '~/', '~/Projects', '~/Downloads', '/' },
+            suppressed_dirs = { '~/', '~/Projects', '~/Downloads', '/', '~/.config' },
             -- log_level = 'debug',
         }
     },
+
+    -- Leetcode-nvim
+    {
+        "kawre/leetcode.nvim",
+        build = ":TSUpdate html",
+        dependencies = {
+            "nvim-telescope/telescope.nvim",
+            "nvim-lua/plenary.nvim", -- required by telescope
+            "MunifTanjim/nui.nvim",
+
+            -- optional
+            "nvim-treesitter/nvim-treesitter",
+            "rcarriga/nvim-notify",
+            "nvim-tree/nvim-web-devicons",
+        },
+        opts = {
+            ---@type lc.lang
+            lang = "python3",
+            ---@type boolean
+            image_support = true,
+            -- configuration goes here
+        },
+    },
+
+    -- Image-nvim
+    {
+        "vhyrro/luarocks.nvim",
+        priority = 1001, -- this plugin needs to run before anything else
+        opts = {
+            rocks = { "magick" },
+        },
+    },
+    {
+        "3rd/image.nvim",
+        dependencies = { "luarocks.nvim" },
+        config = function()
+            require("image").setup({
+                backend = "kitty",
+                max_height_window_percentage = 50,
+                hijack_file_patterns = { "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp", "*.svg" },
+            })
+        end
+    },
+
+
+
+    -- Rust-tools
     {
         "simrat39/rust-tools.nvim",
         ft = "rust",
