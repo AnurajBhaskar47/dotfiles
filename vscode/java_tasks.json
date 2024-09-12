@@ -19,10 +19,15 @@
         {
             "label": "compile and run",
             "type": "shell",
-            "command": "javac ${file} && java ${fileBasenameNoExtension} < input.txt > output.txt",
+            "command": "javac ${file} && java ${fileBasenameNoExtension} < ${workspaceFolder}/.vscode/input.txt > ${workspaceFolder}/.vscode/output.txt && rm ${fileBasenameNoExtension}.class",
             "group": {
                 "kind": "build",
                 "isDefault": true,
+            },
+            "presentation": {
+                "reveal": "never",
+                "panel": "shared",
+                "clear": true,
             }
         },
     ]

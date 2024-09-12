@@ -22,10 +22,15 @@
         {
             "label": "compile and run",
             "type": "shell",
-            "command": "g++ -o ${fileBasenameNoExtension} ${file} && ./${fileBasenameNoExtension} < input.txt > output.txt",
+            "command": "g++ -o ${fileBasenameNoExtension} ${file} && ./${fileBasenameNoExtension} < ${workspaceFolder}/.vscode/input.txt > ${workspaceFolder}/.vscode/output.txt && rm ${fileBasenameNoExtension}",
             "group": {
                 "kind": "build",
                 "isDefault": true,
+            },
+            "presentation": {
+                "reveal": "never",
+                "panel": "shared",
+                "clear": true,
             }
         },
 
