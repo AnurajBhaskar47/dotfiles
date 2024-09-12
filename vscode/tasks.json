@@ -1,0 +1,77 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "compile java",
+            "type": "shell",
+            "command": "javac",
+            "args": [
+                "${file}"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "compile and run java",
+            "type": "shell",
+            "command": "javac ${file} && java ${fileBasenameNoExtension} < ${workspaceFolder}/.vscode/input.txt > ${workspaceFolder}/.vscode/output.txt && rm ${fileBasenameNoExtension}.class",
+            "group": {
+                "kind": "build",
+                "isDefault": false,
+            },
+            "presentation": {
+                "reveal": "never",
+                "panel": "shared",
+                "clear": true,
+            }
+        },
+
+        // Cpp build tasks
+        {
+            "label": "compile cpp",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "${file}"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "compile and run cpp",
+            "type": "shell",
+            "command": "g++ -o ${fileBasenameNoExtension} ${file} && ./${fileBasenameNoExtension} < ${workspaceFolder}/.vscode/input.txt > ${workspaceFolder}/.vscode/output.txt && rm ${fileBasenameNoExtension}",
+            "group": {
+                "kind": "build",
+                "isDefault": false,
+            },
+            "presentation": {
+                "reveal": "never",
+                "panel": "shared",
+                "clear": true,
+            }
+        },
+
+        // Python build tasks
+        {
+            "label": "compile and run",
+            "type": "shell",
+            "command": "python -u ${file} < ${workspaceFolder}/.vscode/input.txt > ${workspaceFolder}/.vscode/output.txt",
+            "group": {
+            "kind": "build",
+            "isDefault": true
+            },
+            "presentation": {
+                "reveal": "never",
+                "panel": "shared",
+                "clear": true,
+            }
+        },
+    ]
+}
