@@ -95,7 +95,9 @@ call plug#begin('~/.vim/plugged')
     Plug 'preservim/nerdcommenter'
 
     Plug 'vim-airline/vim-airline'
-    
+
+    Plug 'vim-airline/vim-airline-themes'
+
 call plug#end()
 
 " }}}
@@ -158,6 +160,13 @@ nnoremap <silent> <leader>c} V}:call nerdcommenter#Comment('x', 'toggle')<CR>
 nnoremap <silent> <leader>c{ V{:call nerdcommenter#Comment('x', 'toggle')<CR>
 nnoremap <leader>/ :call nerdcommenter#Comment(0,"toggle")<CR>
 " }}}
+
+
+" COLORSCHEME -------------------------------------------------------------- {{{
+set termguicolors
+syntax enable
+colorscheme catppuccin_frappe
+let g:airline_theme='onedark'
 
 
 " VIMSCRIPT -------------------------------------------------------------- {{{
