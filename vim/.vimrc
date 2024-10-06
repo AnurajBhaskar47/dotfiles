@@ -96,7 +96,7 @@ call plug#begin('~/.vim/plugged')
 
     Plug 'vim-airline/vim-airline'
 
-    Plug 'vim-airline/vim-airline-themes'
+    Plug 'catppuccin/vim', { 'as': 'catppuccin' }
 
 call plug#end()
 
@@ -165,8 +165,8 @@ nnoremap <leader>/ :call nerdcommenter#Comment(0,"toggle")<CR>
 " COLORSCHEME -------------------------------------------------------------- {{{
 set termguicolors
 syntax enable
-colorscheme catppuccin_frappe
-let g:airline_theme='onedark'
+colorscheme catppuccin_mocha
+let g:airline_theme='catppuccin_mocha'
 
 
 " VIMSCRIPT -------------------------------------------------------------- {{{
