@@ -11,11 +11,11 @@
 
 for_window [class="^.*"] border pixel 1
 
-# set $mod Mod4
-set $mod Mod1
+set $mod Mod4
+#set $mod Mod1
 
 exec --no-startup-id picom
-exec --no-startup-id feh --bg-scale ~/Pictures/swww/Catppuccin-Mocha/cat_leaves.png
+exec --no-startup-id feh --bg-scale ~/Pictures/Wallpapers/nice-blue-background.png
 exec --no-startup-id xrdb -merge ~/.Xresources
 exec_always --no-startup-id setxkbmap -option ctrl:nocaps
 
@@ -23,7 +23,8 @@ exec_always --no-startup-id setxkbmap -option ctrl:nocaps
 exec_always killall polybar
 exec_always --no-startup-id ~/.config/polybar/launch_polybar.sh
 
-bindsym Print exec maim "/home/$USER/Pictures/$(date).jpg"
+#bindsym Print exec maim "/home/$USER/Pictures/$(date).jpg"
+bindsym $mod+Shift+S exec maim "/home/$USER/Pictures/$(date).jpg"
 bindsym $mod+Print exec maim --window $(xdotool getactivewindow) "/home/$USER/Pictures/$(date).jpg"
 bindsym Shift+Print exec maim --select "/home/$USER/Pictures/$(date).jpg"
 
@@ -77,7 +78,7 @@ bindsym Mod4+q kill
 # start rofi (a program launcher)
 bindsym $mod+d exec --no-startup-id rofi -show drun
 bindsym $mod+space exec --no-startup-id rofi -show combi
-bindsym $mod+w exec --no-startup-id rofi -show window
+#bindsym $mod+w exec --no-startup-id rofi -show window
 
 # change focus
 bindsym $mod+h focus left
@@ -144,6 +145,10 @@ bindsym $mod+7 workspace number $ws7
 bindsym $mod+8 workspace number $ws8
 bindsym $mod+9 workspace number $ws9
 bindsym $mod+0 workspace number $ws10
+
+# switch to next and previous workspace
+bindsym $mod+Control+l workspace next
+bindsym $mod+Control+h workspace prev
 
 # move focused container to workspace
 bindsym $mod+Shift+1 move container to workspace number $ws1
