@@ -15,17 +15,18 @@ set $mod Mod4
 #set $mod Mod1
 
 exec --no-startup-id picom
-exec --no-startup-id feh --bg-scale ~/Pictures/Wallpapers/Tree-alone-dark-evening-wallpaper-scaled.png
+exec --no-startup-id feh --bg-scale ~/Pictures/Wallpapers/Tree-alone-dark-evening-wallpaper-scaled.jpg
 exec --no-startup-id xrdb -merge ~/.Xresources
 exec --no-startup-id /usr/lib/gsd-xsettings
 exec_always --no-startup-id setxkbmap -option ctrl:nocaps
+exec --no-startup-id greenclip daemon
 
 # kill any hanging polybar processes
 exec_always killall polybar
 exec_always --no-startup-id ~/.config/polybar/launch_polybar.sh
 
 #bindsym Print exec maim "/home/$USER/Pictures/$(date).jpg"
-bindsym $mod+Shift+S exec maim "/home/$USER/Pictures/$(date).jpg"
+bindsym $mod+Shift+S exec maim "/home/$USER/Pictures/Screenshots/$(date).jpg"
 bindsym $mod+Print exec maim --window $(xdotool getactivewindow) "/home/$USER/Pictures/$(date).jpg"
 bindsym Shift+Print exec maim --select "/home/$USER/Pictures/$(date).jpg"
 
@@ -79,7 +80,8 @@ bindsym Mod4+q kill
 # start rofi (a program launcher)
 bindsym $mod+d exec --no-startup-id rofi -show drun
 bindsym $mod+space exec --no-startup-id rofi -show combi
-#bindsym $mod+w exec --no-startup-id rofi -show window
+bindsym $mod+Tab exec --no-startup-id rofi -show window
+bindsym $mod+v exec --no-startup-id rofi -modi "clipboard:greenclip print" -show clipboard -run-command '{cmd}'
 
 # change focus
 bindsym $mod+h focus left
