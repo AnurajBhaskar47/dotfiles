@@ -129,7 +129,7 @@ alias mkdir='mkdir -p'
 
 # Fixes "Error opening terminal: xterm-kitty" when using the default kitty term to open some programs through ssh
 alias ssh='kitten ssh'
-alias zshconfig='lvim ~/.zshrc'
+alias zshconfig='vim ~/.zshrc'
 alias src='source ~/.zshrc'
 alias l='lvim'
 alias cat='bat'
