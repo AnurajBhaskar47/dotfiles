@@ -136,7 +136,6 @@ alias cat='bat'
 alias open='xdg-open'
 alias gedit='gnome-text-editor'
 eval "$(zoxide init zsh)"
-eval $(thefuck --alias)
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 # [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
@@ -148,13 +147,12 @@ export DENO_INSTALL="/home/aj-47/.deno"
 export PATH="$DENO_INSTALL/bin:$PATH"
 export PATH=/home/aj-47/go/bin/:$PATH
 # export ELECTRON_OZONE_PLATFORM_HINT=auto
-source ~/.custom_commands.sh
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # Set up fzf key binding
-source <(fzf --zsh)
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 bindkey -r '^T'
 bindkey '^F' fzf-file-widget
 
