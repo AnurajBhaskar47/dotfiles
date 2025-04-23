@@ -100,22 +100,8 @@ source $ZSH/oh-my-zsh.sh
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
-alias zshconfig="lvim ~/.zshrc"
+# alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-
-# Helpful aliases
-# alias  c='clear' # clear terminal
-# alias  l='eza -lh  --icons=auto' # long list
-# alias ls='eza -1   --icons=auto' # short list
-# alias ll='eza -lha --icons=auto --sort=name --group-directories-first' # long list all
-# alias ld='eza -lhD --icons=auto' # long list dirs
-# alias un='$aurhelper -Rns' # uninstall package
-# alias up='$aurhelper -Syu' # update system/package/aur
-# alias pl='$aurhelper -Qs' # list installed package
-# alias pa='$aurhelper -Ss' # list availabe package
-# alias pc='$aurhelper -Sc' # remove unused cache
-# alias po='$aurhelper -Qtdq | $aurhelper -Rns -' # remove unused packages, also try > $aurhelper -Qqd | $aurhelper -Rsu --print -
-# alias vc='code --ozone-platform-hint=wayland --disable-gpu' # gui code editor
 
 # Handy change dir shortcuts
 alias ..='cd ..'
@@ -129,27 +115,24 @@ alias mkdir='mkdir -p'
 
 # Fixes "Error opening terminal: xterm-kitty" when using the default kitty term to open some programs through ssh
 # alias ssh='kitten ssh'
-alias zconf'vim ~/.zshrc'
+alias zconf='nvim ~/.zshrc'
 alias src='source ~/.zshrc'
-# alias vim='nvim'
+alias pip='pip3'
 alias cat='bat'
-alias open='xdg-open'
-alias gedit='gnome-text-editor'
+alias vim='nvim'
+# alias open='xdg-open'
+# alias gedit='gnome-text-editor'
+# alias wm='nvim ~/.config/i3/config'
 eval "$(zoxide init zsh)"
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-# [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-
-# Export paths
-export PATH=/home/aj-47/.local/bin:$PATH
-export DENO_INSTALL="/home/aj-47/.deno"
-export PATH="$DENO_INSTALL/bin:$PATH"
-export PATH=/home/aj-47/go/bin/:$PATH
-# export ELECTRON_OZONE_PLATFORM_HINT=auto
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+function git() {
+  if [[ $1 == "l" ]]; then
+    shift
+    command git log --oneline --graph "$@"
+  else
+    command git "$@"
+  fi
+}
 
 # Set up fzf key binding
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
@@ -160,3 +143,13 @@ HISTFILE=~/.zsh_history
 HISTSIZE=10000
 SAVEHIST=10000
 setopt appendhistory
+
+# Export paths
+export PATH=$HOME/.local/bin:$PATH
+export DENO_INSTALL="$HOME/.deno"
+export PATH="$DENO_INSTALL/bin:$PATH"
+export PATH=$HOME/go/bin/:$PATH
+# export ELECTRON_OZONE_PLATFORM_HINT=auto
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
