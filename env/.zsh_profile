@@ -1,0 +1,35 @@
+export XDG_CONFIG_HOME=$HOME/.config
+VIM="nvim"
+
+# PERSONAL=$XDG_CONFIG_HOME/personal
+# for i in `find -L $PERSONAL`; do
+#	source $i
+#done
+
+# Set up fzf keybinding
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# bindkey -r '^T'
+# bindkey '^F' fzf-file-widget
+
+bindkey -s '^F' "tmux-sessionizer\n"
+
+export GOPATH=$HOME/.local/go
+export GIT_EDITOR=$VIM
+export DENO_INSTALL="$HOME/.deno"
+export DEV_ENV_HOME="$HOME/personal/dev"
+
+addToPath() {
+    if [[ "$PATH" != *"1"* ]]; then
+        export PATH=$PATH:$1
+    fi
+}
+
+addToPathFront() {
+    if [[ "$PATH" != *"$1"* ]]; then
+        export PATH=$1:$PATH
+    fi
+}
+
+addToPathFront $HOME/.local/go/bin
+addToPathFront $HOME/.cargo/bin
+addToPathFront $HOME/.local/scripts
