@@ -134,10 +134,6 @@ function git() {
   fi
 }
 
-# Set up fzf key binding
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-bindkey -r '^T'
-bindkey '^F' fzf-file-widget
 
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
@@ -145,11 +141,7 @@ SAVEHIST=10000
 setopt appendhistory
 
 # Export paths
-export PATH=$HOME/.local/bin:$PATH
-export DENO_INSTALL="$HOME/.deno"
-export PATH="$DENO_INSTALL/bin:$PATH"
-export PATH=$HOME/go/bin/:$PATH
-# export ELECTRON_OZONE_PLATFORM_HINT=auto
+source ~/.zsh_profile
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

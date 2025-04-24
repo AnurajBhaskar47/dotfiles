@@ -1,5 +1,4 @@
-edy-tmux
-!/usr/bin/env bash
+#!/usr/bin/env bash
 
 selected=$(find $HOME/personal -mindepth 1 -maxdepth 1 -type d | fzf)
 if [[ -z "$selected" ]]; then

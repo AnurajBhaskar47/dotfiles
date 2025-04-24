@@ -50,6 +50,6 @@ copy_file() {
   execute cp -r $from $to/$name
 }
 
-copy_dir .config $HOME/.config
+# copy_dir .config $HOME/.config
 copy_dir .local $HOME/.local
 # copy_file .zsh_profile $HOME

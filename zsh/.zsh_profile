@@ -1,5 +1,4 @@
 export XDG_CONFIG_HOME=$HOME/.config
-VIM="nvim"
 
 # PERSONAL=$XDG_CONFIG_HOME/personal
 # for i in `find -L $PERSONAL`; do
@@ -30,6 +29,7 @@ addToPathFront() {
     fi
 }
 
+addToPathFront $DENO_INSTALL
 addToPathFront $HOME/.local/go/bin
-addToPathFront $HOME/.cargo/bin
 addToPathFront $HOME/.local/scripts
+# addToPathFront $HOME/.cargo/bin
