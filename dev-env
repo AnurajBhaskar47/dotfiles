@@ -50,7 +50,8 @@ copy_file() {
   execute cp -r $from $to/$name
 }
 
-# copy_dir .config $HOME/.config
+copy_dir .config $HOME/.config
 copy_dir .local $HOME/.local
 copy_file .zshenv $HOME
 copy_file .zshrc $HOME
+copy_file .ready-tmux $HOME
