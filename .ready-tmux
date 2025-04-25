@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+tmux neww -dn scratch
+tmux send-keys -t $selected_name:zsh "nvim ." 
