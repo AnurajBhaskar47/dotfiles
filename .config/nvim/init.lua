@@ -1,7 +1,19 @@
 vim.g.base46_cache = vim.fn.stdpath "data" .. "/base46/"
 vim.g.mapleader = " "
+vim.wo.relativenumber = true
 
-vim.opt.scrolloff = 15
+local autocmd = vim.api.nvim_create_autocmd
+
+autocmd("FileType", {
+  pattern = { "python", "c", "cpp", "java", "go" },
+  callback = function()
+    vim.opt_local.tabstop = 4
+    vim.opt_local.shiftwidth = 4
+    vim.opt_local.softtabstop = 4
+    vim.opt_local.expandtab = true
+  end,
+})
+
 -- bootstrap lazy and all plugins
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 

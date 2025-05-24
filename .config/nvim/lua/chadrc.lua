@@ -6,7 +6,7 @@
 local M = {}
 
 M.base46 = {
-	theme = "onedark",
+	theme = "aylin",
 
 	-- hl_override = {
 	-- 	Comment = { italic = true },
@@ -15,10 +15,18 @@ M.base46 = {
 }
 
 -- M.nvdash = { load_on_startup = true }
--- M.ui = {
---       tabufline = {
---          lazyload = false
---      }
---}
+M.ui = {
+  transparency = true,
+ --  tabufline = {
+ --     lazyload = false
+ -- }
+}
+
+-- M.nvimtree = {
+--   filters = {
+--     dotfiles = false,
+--     ignore = false,
+--   },
+-- }
 
 return M
