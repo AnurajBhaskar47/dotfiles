@@ -1,6 +1,7 @@
 vim.g.base46_cache = vim.fn.stdpath "data" .. "/base46/"
 vim.g.mapleader = " "
 vim.wo.relativenumber = true
+vim.opt.scrolloff = 8
 
 local autocmd = vim.api.nvim_create_autocmd
 
