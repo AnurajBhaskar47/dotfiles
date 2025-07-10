@@ -20,7 +20,7 @@ export DENO_INSTALL="$HOME/.deno"
 export DEV_ENV_HOME="$HOME/personal/dev"
 
 addToPath() {
-    if [[ "$PATH" != *"1"* ]]; then
+    if [[ "$PATH" != *"$1"* ]]; then
         export PATH=$PATH:$1
     fi
 }
