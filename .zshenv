@@ -19,6 +19,15 @@ export GIT_EDITOR=$VIM
 export DENO_INSTALL="$HOME/.deno"
 export DEV_ENV_HOME="$HOME/personal/dev"
 
+function git() {
+  if [[ $1 == "l" ]]; then
+    shift
+    command git log --oneline --graph "$@"
+  else
+    command git "$@"
+  fi
+}
+
 addToPath() {
     if [[ "$PATH" != *"$1"* ]]; then
         export PATH=$PATH:$1
