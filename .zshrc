@@ -125,16 +125,6 @@ alias vim='nvim'
 # alias wm='nvim ~/.config/i3/config'
 eval "$(zoxide init zsh)"
 
-function git() {
-  if [[ $1 == "l" ]]; then
-    shift
-    command git log --oneline --graph "$@"
-  else
-    command git "$@"
-  fi
-}
-
-
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
 SAVEHIST=10000
