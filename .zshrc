@@ -115,15 +115,18 @@ alias mkdir='mkdir -p'
 
 # Fixes "Error opening terminal: xterm-kitty" when using the default kitty term to open some programs through ssh
 # alias ssh='kitten ssh'
-alias zconf='nvim ~/.zshrc'
-alias src='source ~/.zshrc'
+alias zconf='vim ~/.zshrc'
+alias zenv='vim ~/.zshenv'
+alias src='source ~/.zshrc ~/.zshenv'
 alias pip='pip3'
-alias cat='bat'
-alias vim='nvim'
+# alias cat='bat'
+# alias vim='nvim'
 # alias open='xdg-open'
 # alias gedit='gnome-text-editor'
 # alias wm='nvim ~/.config/i3/config'
 eval "$(zoxide init zsh)"
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
