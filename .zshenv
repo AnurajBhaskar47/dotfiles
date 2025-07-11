@@ -7,11 +7,6 @@ export XDG_CONFIG_HOME=$HOME/.config
 #	source $i
 #done
 
-# Set up fzf keybinding
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-# bindkey -r '^T'
-# bindkey '^F' fzf-file-widget
-
 bindkey -s '^F' "tmux-sessionizer\n"
 
 export GOPATH=$HOME/.local/go
