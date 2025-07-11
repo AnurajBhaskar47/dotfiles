@@ -126,7 +126,10 @@ alias pip='pip3'
 # alias wm='nvim ~/.config/i3/config'
 eval "$(zoxide init zsh)"
 
+# Set up fzf keybinding
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# bindkey -r '^T'
+# bindkey '^F' fzf-file-widget
 
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
