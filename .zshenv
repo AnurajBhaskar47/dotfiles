@@ -8,6 +8,7 @@ export XDG_CONFIG_HOME=$HOME/.config
 #done
 
 bindkey -s '^F' "tmux-sessionizer\n"
+# setxkbmap -option caps:escape
 
 export GOPATH=$HOME/.local/go
 export GIT_EDITOR=$VIM
