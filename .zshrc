@@ -110,26 +110,17 @@ alias .3='cd ../../..'
 alias .4='cd ../../../..'
 alias .5='cd ../../../../..'
 
-# Always mkdir a path (this doesn't inhibit functionality to make a single dir)
 alias mkdir='mkdir -p'
 
-# Fixes "Error opening terminal: xterm-kitty" when using the default kitty term to open some programs through ssh
-# alias ssh='kitten ssh'
 alias zconf='vim ~/.zshrc'
 alias zenv='vim ~/.zshenv'
-alias src='source ~/.zshrc ~/.zshenv'
+alias src='source ~/.zprofile ~/.zshrc ~/.zshenv'
+alias vim='nvim'
 alias pip='pip3'
-# alias cat='bat'
-# alias vim='nvim'
-# alias open='xdg-open'
-# alias gedit='gnome-text-editor'
-# alias wm='nvim ~/.config/i3/config'
 eval "$(zoxide init zsh)"
 
 # Set up fzf keybinding
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-# bindkey -r '^T'
-# bindkey '^F' fzf-file-widget
 
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
