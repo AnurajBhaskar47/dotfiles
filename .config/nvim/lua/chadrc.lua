@@ -8,10 +8,15 @@ local M = {}
 M.base46 = {
 	theme = "aylin",
 
-	-- hl_override = {
+	hl_override = {
+		Visual = {
+	      fg = "#262625",
+	      bg = "#f0c674",
+	      bold = true,
+	    },
 	-- 	Comment = { italic = true },
 	-- 	["@comment"] = { italic = true },
-	-- },
+	},
 }
 
 -- M.nvdash = { load_on_startup = true }
