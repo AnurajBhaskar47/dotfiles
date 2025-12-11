@@ -5,3 +5,24 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+[alias]
+  l = log --oneline --graph
+  oc = "!f() { \
+        OFFSET_DURATION=51; \
+        OFFSET_DATE=$(date -j -v-\"${OFFSET_DURATION}\"d \"+%Y-%m-%d %H:%M:%S\"); \
+        GIT_AUTHOR_DATE=\"${OFFSET_DATE}\" GIT_COMMITTER_DATE=\"${OFFSET_DATE}\" git commit \"$@\"; \
+    }; f"
+  ocm = "!f() { \
+        OFFSET_DURATION=${1:-1}; \
+        \
+        if ! [[ \"$OFFSET_DURATION\" =~ ^[0-9]+$ ]]; then\
+            echo \"Error: First argument must be a number (e.g., git ocm 2 -m 'msg')\";\
+            return 1;\
+        fi;\
+        \
+        OFFSET_DATE=$(date -j -v-\"${OFFSET_DURATION}\"d \"+%Y-%m-%d %H:%M:%S\"); \
+        \
+        shift;\
+        \
+        GIT_AUTHOR_DATE=\"${OFFSET_DATE}\" GIT_COMMITTER_DATE=\"${OFFSET_DATE}\" git commit \"$@\"; \
+    }; f"
