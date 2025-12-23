@@ -112,12 +112,8 @@ alias .5='cd ../../../../..'
 
 alias mkdir='mkdir -p'
 
-alias zconf='vim ~/.zshrc'
-alias zenv='vim ~/.zshenv'
-alias src='source ~/.zprofile ~/.zshrc ~/.zshenv'
 alias vim='nvim'
 alias pip='pip3'
-eval "$(zoxide init zsh)"
 
 # Set up fzf keybinding
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
