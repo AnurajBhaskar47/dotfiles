@@ -1,13 +1,12 @@
-export XDG_CONFIG_HOME=$HOME/.config
-# . "$HOME/.cargo/env"
-
 # bindkey -s '^F' "tmux-sessionizer\n"
-# setxkbmap -option caps:escape
 
+# . "$HOME/.cargo/env"
+export XDG_CONFIG_HOME=$HOME/.config
 # export GOPATH=$HOME/.local/go
-# export GIT_EDITOR=$VIM
+# export DEV="$HOME/Dev"
 # export DENO_INSTALL="$HOME/.deno"
-# export DEV_ENV_HOME="$HOME/personal/dev"
+
+# setxkbmap -option caps:escape
 
 addToPath() {
     if [[ "$PATH" != *"$1"* ]]; then
@@ -21,7 +20,8 @@ addToPathFront() {
     fi
 }
 
-# addToPathFront $DENO_INSTALL
+# addToPathFront $HOME/.local/bin
 # addToPathFront $HOME/.local/go/bin
 # addToPathFront $HOME/.local/scripts
 # addToPathFront $HOME/.cargo/bin
+# addToPathFront $DENO_INSTALL
