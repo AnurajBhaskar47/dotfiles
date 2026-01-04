@@ -1,0 +1,90 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "ssh_connections": [
+    {
+      "host": "fedora",
+      "username": "aj47",
+      "args": [],
+      "projects": [
+        {
+          "paths": [
+            "/home/aj47/Dev/hackathon2025-PixelPhantom-08-main"
+          ]
+        }
+      ]
+    }
+  ],
+  "edit_predictions": {
+    "mode": "subtle"
+  },
+  "project_panel": {
+    "hide_hidden": false
+  },
+  "relative_line_numbers": "enabled",
+  "agent": {
+    "default_profile": "ask",
+    "default_model": {
+      "provider": "copilot_chat",
+      "model": "claude-opus-4.5"
+    },
+    "model_parameters": []
+  },
+  "terminal": {
+    "font_family": ".ZedMono"
+  },
+  "base_keymap": "VSCode",
+  "sticky_scroll": {
+    "enabled": false
+  },
+  "vertical_scroll_margin": 8.0,
+  "gutter": {
+    "line_numbers": true
+  },
+  "autosave": {
+    "after_delay": {
+      "milliseconds": 1000
+    }
+  },
+  "file_types": {
+    "clojure": ["*.al"]
+  },
+  "vim_mode": true,
+  "ui_font_size": 16,
+  "buffer_font_size": 15,
+  "theme": {
+    "mode": "system",
+    "light": "Ayu Light",
+    "dark": "Ayu Dark"
+  },
+  "lsp": {
+    "jdtls": {
+      "settings": {
+        "java_home": "/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home",
+        "lombok_support": true,
+        "jdk_auto_download": false,
+
+        // Controls when to check for updates for JDTLS, Lombok, and Debugger
+        // - "always" (default): Always check for and download the latest version
+        // - "once": Check for updates only if no local installation exists
+        // - "never": Never check for updates, only use existing local installations (errors if missing)
+        //
+        // Note: Invalid values will default to "always"
+        // If custom paths (below) are provided, check_updates is IGNORED for that component
+        "check_updates": "always"
+
+        // Use custom installations instead of managed downloads
+        // When these are set, the extension will not download or manage these components
+        // "jdtls_launcher": "/path/to/your/jdt-language-server/bin/jdtls",
+        // "lombok_jar": "/path/to/your/lombok.jar",
+        // "java_debug_jar": "/path/to/your/com.microsoft.java.debug.plugin.jar"
+      }
+    }
+  }
+}
