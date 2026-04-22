@@ -1,5 +1,10 @@
-// Place your key bindings in this file to override the defaultsauto[]
+// Place your key bindings in this file to override the defaults
 [
+    {
+        "key": "u",
+        "when": "editorTextFocus && vim.active && vim.mode == 'Normal'",
+        "command": "noop"
+    },
     {
         "key": "ctrl+tab",
         "command": "workbench.action.nextEditor"
@@ -27,22 +32,36 @@
         "command": "workbench.action.focusActiveEditorGroup"
     },
     {
-        "key": "ctrl+f5",
+        "key": "cmd+r",
         "command": "workbench.action.reloadWindow",
         "when": "editorTextFocus"
     },
     {
-        "key": "shift+alt+down",
-        "command": "editor.action.copyLinesDownAction",
+        "key": "ctrl+=",
+        "command": "editor.action.fontZoomIn"
+    },
+    {
+        "key": "ctrl+-",
+        "command": "editor.action.fontZoomOut"
+    },
+    {
+        "key": "ctrl+shift+up",
+        "command": "editor.action.insertCursorAbove",
         "when": "editorTextFocus"
     },
     {
-        "key": "shift+alt+up",
-        "command": "editor.action.copyLinesUpAction",
+        "key": "alt+cmd+up",
+        "command": "-editor.action.insertCursorAbove",
         "when": "editorTextFocus"
     },
     {
-        "key": "ctrl+'",
-        "command": "code-runner.run"
+        "key": "ctrl+shift+down",
+        "command": "editor.action.insertCursorBelow",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "alt+cmd+down",
+        "command": "-editor.action.insertCursorBelow",
+        "when": "editorTextFocus"
     },
 ]
