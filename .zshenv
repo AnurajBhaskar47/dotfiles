@@ -1,4 +1,4 @@
-# bindkey -s '^F' "tmux-sessionizer\n"
+# bindkey -s '^V' "tmux-sessionizer\n"
 
 # . "$HOME/.cargo/env"
 export XDG_CONFIG_HOME=$HOME/.config
