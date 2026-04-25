@@ -2,8 +2,8 @@
 (menu-bar-mode 0)
 (tool-bar-mode 0)
 (column-number-mode 1)
+(setq display-line-numbers-type 'relative)
 (global-display-line-numbers-mode)
-;;; -*- lexical-binding: t -*-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -13,11 +13,18 @@
  '(custom-safe-themes
    '("e13beeb34b932f309fb2c360a04a460821ca99fe58f69e65557d6c1b10ba18c7"
      default))
- '(display-line-numbers-type 'relative)
- '(package-selected-packages '(gruber-darker-theme)))
+ '(display-line-numbers 'relative)
+ '(package-selected-packages '(gruber-darker-theme lsp-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+(use-package lsp-mode
+  :init (setq lsp-keymap-prefix "C-c l")
+  :hook (prog-mode . lsp-deferred)
+  :commands (lsp lsp-deferred))
+(use-package lsp-mode
+  :hook ((typescript-mode . lsp-deferred)
+         (tsx-ts-mode . lsp-deferred)))
