@@ -3,7 +3,12 @@ local options = {
     lua = { "stylua" },
     css = { "prettier" },
     html = { "prettier" },
-    go = {"gopls"},
+    typescript = { "prettier" },
+    javascript = { "prettier" },
+    go = { "gopls" },
+    c = { "clang_format" },
+    cpp = { "clang_format" },
+    java = { "google-java-format" },
   },
 
   -- format_on_save = {
