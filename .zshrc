@@ -115,6 +115,7 @@ alias mkdir='mkdir -p'
 alias vim='nvim'
 alias pip='pip3'
 alias python='python3'
+alias lg='lazygit'
 
 # Set up fzf keybinding
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
