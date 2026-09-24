@@ -126,6 +126,28 @@ SAVEHIST=10000
 setopt appendhistory
 
 # Export paths
+. "$HOME/.cargo/env"
+export JAVA_HOME=$(/usr/libexec/java_home)
+export XDG_CONFIG_HOME=$HOME/.config
+export GOPATH=$HOME/.local/go
+export PROJECTS=$HOME/Projects
+
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+bindkey -s '^V' "tmux-sessionizer\n"
+
+addToPathFront() {
+    if [[ "$PATH" != *"$1"* ]]; then
+        export PATH=$1:$PATH
+    fi
+}
+
+addToPathFront $HOME/.local/bin
+addToPathFront $HOME/.local/go/bin
+addToPathFront $HOME/.local/scripts
+addToPathFront $JAVA_HOME/bin
+addToPathFront $(brew --prefix python@3.10)/libexec/bin
+# addToPathFront $HOME/.cargo/bin
+
