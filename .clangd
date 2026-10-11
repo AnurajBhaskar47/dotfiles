@@ -1,0 +1,12 @@
+If:
+  PathMatch: '.*\.(c|h)$'
+CompileFlags:
+  Add: [-std=c17, -Wall]
+
+---
+
+If:
+  PathMatch: '.*\.(cpp|cc|cxx|hpp|hh|hxx)$'
+CompileFlags:
+  Add: [-std=c++26]
+

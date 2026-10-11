@@ -103,7 +103,13 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-# Handy change dir shortcuts
+# Export paths
+export PROJECTS="$HOME/Projects"
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+export XDG_CONFIG_HOME=$HOME/.config
+export GOPATH=$HOME/.local/go
+
+# Aliases
 alias ..='cd ..'
 alias ...='cd ../..'
 alias .3='cd ../../..'
@@ -111,10 +117,7 @@ alias .4='cd ../../../..'
 alias .5='cd ../../../../..'
 
 alias mkdir='mkdir -p'
-
 alias vim='nvim'
-alias pip='pip3'
-alias python='python3'
 alias lg='lazygit'
 
 # Set up fzf keybinding
@@ -125,17 +128,6 @@ HISTSIZE=10000
 SAVEHIST=10000
 setopt appendhistory
 
-# Export paths
-. "$HOME/.cargo/env"
-export JAVA_HOME=$(/usr/libexec/java_home)
-export XDG_CONFIG_HOME=$HOME/.config
-export GOPATH=$HOME/.local/go
-export PROJECTS=$HOME/Projects
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
 bindkey -s '^V' "tmux-sessionizer\n"
 
 addToPathFront() {
@@ -145,9 +137,11 @@ addToPathFront() {
 }
 
 addToPathFront $HOME/.local/bin
-addToPathFront $HOME/.local/go/bin
 addToPathFront $HOME/.local/scripts
-addToPathFront $JAVA_HOME/bin
-addToPathFront $(brew --prefix python@3.10)/libexec/bin
-# addToPathFront $HOME/.cargo/bin
+eval "$(~/.local/bin/mise activate zsh)"
+
+# Pyenv Init
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
 
