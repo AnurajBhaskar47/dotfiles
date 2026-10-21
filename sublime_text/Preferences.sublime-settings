@@ -1,0 +1,9 @@
+{
+	"font_size": 17,
+	"ignored_packages":
+	[
+		"Vintage",
+	],
+	"index_files": true,
+	"scroll_context_lines": 8,
+}
