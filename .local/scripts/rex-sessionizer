@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root="${PROJECTS_DIR:-$HOME/Projects}"
+selected=$(find "$root" -mindepth 1 -maxdepth 1 -type d | fzf --prompt='Project > ') || exit 0
+label=$(basename "$selected")
+
+# Set REX_CLIENT to a label or ID from `rex client ls`.
+: "${REX_CLIENT:?Set REX_CLIENT to your Rex client label or ID}"
+
+session_id=$(
+  rex ls --json |
+    jq -r --arg label "$label" \
+      '.sessions[] | select(.label == $label) | .session_id' |
+    head -n 1
+)
+
+if [[ -z "$session_id" ]]; then
+  created=$(rex new "$label" -c "$selected" --json)
+  session_id=$(jq -er '.session_id' <<<"$created")
+  rex window new -s "$session_id" scratch --focus=false -c "$selected"
+fi
+
+rex -C "$REX_CLIENT" do session.select session_id="$session_id"

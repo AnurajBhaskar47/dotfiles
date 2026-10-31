@@ -1,0 +1,124 @@
+[
+	{ "keys": ["alt+`"], "command": "toggle_terminus_panel" },
+    {
+        "keys": ["ctrl+alt+t"], "command": "terminus_open", "args": {
+            "cwd": "${file_path:${folder}}"
+        }
+    },
+
+	// Keybindings
+   	{ "keys": ["ctrl+alt+r"], "command": "reveal_in_side_bar" },
+   	{ "keys": ["ctrl+b"], "command": "move", "args": {"by": "characters", "forward": false} },
+   	{ "keys": ["ctrl+shift+b"], "command": "move", "args": {"by": "characters", "forward": false, "extend": true} },
+	{ "keys": ["ctrl+shift+p"], "command": "move", "args": {"by": "lines", "extend": true, "forward": false} },
+	{ "keys": ["ctrl+shift+s"], "command": "show_scope_name" },
+   	{ "keys": ["ctrl+super+n"], "command": "swap_line_down" },
+	{ "keys": ["ctrl+super+p"], "command": "swap_line_up" },
+	{ "keys": ["ctrl+w"], "command": "prompt_select_workspace" },
+	{ "keys": ["ctrl+u"], "command": "move", "args": {"by": "pages", "forward": false} },
+	{ "keys": ["ctrl+d"], "command": "move", "args": {"by": "pages", "forward": true} },
+
+	// Line Keybindings
+	{ "keys": ["alt+n"], "command": "move", "args": {"by": "stops", "empty_line": true, "forward": true} },
+	{ "keys": ["alt+shift+n"], "command": "move", "args": {"by": "stops", "empty_line": true, "extend": true, "forward": true} },
+	{ "keys": ["alt+p"], "command": "move", "args": {"by": "stops", "empty_line": true, "forward": false} },
+	{ "keys": ["alt+shift+p"], "command": "move", "args": {"by": "stops", "empty_line": true, "extend": true, "forward": false} },
+	{ "keys": ["alt+m"], "command": "move_to", "args": {"to": "bol"} },
+	{ "keys": ["alt+shift+m"], "command": "move_to", "args": {"to": "bol", "extend": true} },
+    { "keys": ["ctrl+a"], "command": "move_to", "args": {"to": "bol"} },
+    { "keys": ["alt+shift+a"], "command": "move_to", "args": {"to": "bol", "extend": true} },
+
+	// Additional Keys
+	{ "keys": ["alt+f"], "command": "move", "args": {"by": "wordends", "forward": true} },
+	{ "keys": ["alt+shift+f"], "command": "move", "args": {"by": "wordends", "extend": true, "forward": true} },
+	{ "keys": ["alt+b"], "command": "move", "args": {"by": "words", "forward": false} },
+	{ "keys": ["alt+shift+b"], "command": "move", "args": {"by": "words", "extend": true, "forward": false} },
+	{ "keys": ["alt+shift+,"], "command": "move_to", "args": {"to": "bof"} },
+	{ "keys": ["alt+shift+."], "command": "move_to", "args": {"to": "eof"} },
+
+
+    // Fast Olympic Coding overrides
+    // Run
+    {
+        "keys": ["ctrl+r"],
+        "command": "view_tester",
+        "args": {
+            "action": "make_opd",
+            "use_debugger": false
+        },
+        "context": [
+            {
+                "operand": "source.TestSyntax",
+                "operator": "not_equal",
+                "match_all": true,
+                "key": "selector"
+            }
+        ]
+    },
+
+    // Run
+    {
+        "keys": ["ctrl+r"],
+        "command": "test_manager",
+        "args": {
+            "action": "make_opd",
+            "load_session": true,
+            "use_debugger": false
+        },
+        "context": [
+            {
+                "operand": "source.TestSyntax",
+                "operator": "equal",
+                "match_all": true,
+                "key": "selector"
+            }
+        ]
+    },
+
+    // Run with Debugger
+    {
+        "keys": ["ctrl+shift+r"],
+        "command": "view_tester",
+        "args": {
+            "action": "make_opd",
+            "use_debugger": true
+        },
+        "context": [
+            {
+                "operand": "source.TestSyntax",
+                "operator": "not_equal",
+                "match_all": true,
+                "key": "selector"
+            }
+        ]
+    },
+
+    // Run with Debugger
+    {
+        "keys": ["ctrl+shift+r"],
+        "command": "test_manager",
+        "args": {
+            "action": "make_opd",
+            "load_session": true,
+            "use_debugger": true
+        },
+        "context": [
+            {
+                "operand": "source.TestSyntax",
+                "operator": "equal",
+                "match_all": true,
+                "key": "selector"
+            }
+        ]
+    },
+
+    // Toggle Right panel
+    {
+        "keys": ["super+k", "super+p"],
+        "command": "view_tester",
+        "args": {
+            "action": "sync_opdebugs"
+        }
+    },
+
+]

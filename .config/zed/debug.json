@@ -1,0 +1,47 @@
+// Some example tasks for common languages.
+//
+// For more documentation on how to configure debug tasks,
+// see: https://zed.dev/docs/debugger
+[
+  {
+    "label": "Cpp debug",
+    "adapter": "CodeLLDB",
+    "program": "$ZED_DIRNAME/$ZED_STEM",
+    "build": "Debug and Run C++",
+    "request": "launch",
+    "cwd": "$ZED_DIRNAME",
+  },
+  {
+    "label": "Launch Java Debugger",
+    "adapter": "Java",
+    "request": "launch",
+    "build": "Compile Java Debug",
+    "mainClass": "$ZED_STEM",
+    // "stopOnEntry": true,
+    "cwd": "$ZED_DIRNAME",
+  },
+  {
+    "label": "Debug active Python file",
+    "adapter": "Debugpy",
+    // "command": "python3",
+    "program": "$ZED_FILE",
+    "request": "launch",
+    "cwd": "$ZED_WORKTREE_ROOT",
+  },
+  {
+    "label": "Debug active JavaScript file",
+    "adapter": "JavaScript",
+    "program": "$ZED_FILE",
+    "request": "launch",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "type": "pwa-node",
+  },
+  {
+    "label": "JavaScript debug terminal",
+    "adapter": "JavaScript",
+    "request": "launch",
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "console": "integratedTerminal",
+    "type": "pwa-node",
+  },
+]

@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+## From source
+# git clone -b v0.10.1 https://github.com/neovim/neovim.git $HOME/personal/neovim
+# sudo apt install lua5.1 liblua5.1-0-dev cmake gettext
+ 
+# cd $HOME/personal/neovim
+# make CMAKE_BUILD_TYPE=RelWithDebInfo
+# sudo make install
+
+## From binary
+to=$HOME/.local/share
+# to=$HOME/Downloads/share
+
+pushd $to > /dev/null
+wget https://github.com/neovim/neovim/releases/download/v0.11.0/nvim-linux-x86_64.tar.gz 
+tar xzf nvim-linux-x86_64.tar.gz 
+rm nvim-linux-x86_64.tar.gz 
+ln -s $to/nvim-linux-x86_64/bin/nvim $(dirname $to)/bin/nvim
+popd > /dev/null

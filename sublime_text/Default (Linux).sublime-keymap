@@ -1,0 +1,115 @@
+[
+	{ "keys": ["alt+`"], "command": "toggle_terminus_panel" },
+	{
+        "keys": ["ctrl+alt+t"], "command": "terminus_open", "args": {
+            "cwd": "${file_path:${folder}}"
+        }
+    },
+
+    // Keybindings
+    { "keys": ["ctrl+alt+r"], "command": "reveal_in_side_bar" },
+    { "keys": ["alt+a"], "command": "select_all" },
+    { "keys": ["alt+b"], "command": "build" },
+    { "keys": ["alt+d"], "command": "find_under_expand" },
+    { "keys": ["alt+k","alt+b"], "command": "toggle_side_bar" },
+    { "keys": ["alt+k","alt+d"], "command": "find_under_expand_skip" },
+    { "keys": ["alt+k","alt+p"], "command": "view_tester", "args": {"action": "sync_opdebugs"} },
+    { "keys": ["alt+e"], "command": "slurp_find_string" },
+    { "keys": ["alt+f"], "command": "show_panel", "args": {"panel": "find", "reverse": false} },
+    { "keys": ["alt+g"], "command": "find_next" },
+    { "keys": ["alt+n"], "command": "new_file" },
+    { "keys": ["alt+p"], "command": "show_overlay", "args": {"overlay": "goto", "show_files": true} },
+    { "keys": ["alt+r"], "command": "show_overlay", "args": {"overlay": "goto", "text": "@"} },
+    { "keys": ["alt+u"], "command": "soft_undo" },
+    { "keys": ["alt+w"], "command": "close"},
+    { "keys": ["alt+/"], "command": "toggle_comment", "args": {"block": false} },
+    { "keys": ["alt+["], "command": "unindent"},
+    { "keys": ["alt+]"], "command": "indent"},
+    { "keys": ["alt+shift+d"], "command": "duplicate_line" },
+    { "keys": ["alt+shift+f"], "command": "show_panel", "args": {"panel": "find_in_files"} },
+    { "keys": ["alt+shift+g"], "command": "find_prev" },
+    { "keys": ["alt+shift+n"], "command": "new_window" },
+    { "keys": ["alt+shift+p"], "command": "show_overlay", "args": {"overlay": "command_palette"} },
+    { "keys": ["alt+shift+r"], "command": "goto_symbol_in_project" },
+    { "keys": ["alt+shift+["], "command": "prev_view" },
+    { "keys": ["alt+shift+]"], "command": "next_view" },
+    { "keys": ["ctrl+f"], "command": "move", "args": {"by": "characters", "forward": true} },
+    { "keys": ["ctrl+shift+f"], "command": "move", "args": {"by": "characters", "extend": true, "forward": true} },
+    { "keys": ["super+f"], "command": "move", "args": {"by": "word_ends", "forward": true} },
+    { "keys": ["super+shift+f"], "command": "move", "args": {"by": "word_ends", "extend": true, "forward": true} },
+    { "keys": ["ctrl+b"], "command": "move", "args": {"by": "characters", "forward": false} },
+    { "keys": ["ctrl+shift+b"], "command": "move", "args": {"by": "characters", "extend": true, "forward": false} },
+    { "keys": ["super+b"], "command": "move", "args": {"by": "words", "forward": false} },
+    { "keys": ["super+shift+b"], "command": "move", "args": {"by": "words", "extend": true, "forward": false} },
+    { "keys": ["ctrl+n"], "command": "move", "args": {"by": "lines", "forward": true} },
+    { "keys": ["ctrl+shift+n"], "command": "move", "args": {"by": "lines", "extend": true, "forward": true} },
+    { "keys": ["super+n"], "command": "move", "args": {"by": "stops", "empty_line": true, "forward": true} },
+    { "keys": ["super+shift+n"], "command": "move", "args": {"by": "stops", "empty_line": true, "extend": true, "forward": true} },
+    { "keys": ["ctrl+alt+n"], "command": "swap_line_down" },
+    { "keys": ["ctrl+alt+p"], "command": "swap_line_up" },
+    { "keys": ["ctrl+alt+up"], "command": "swap_line_down" },
+    { "keys": ["ctrl+alt+down"], "command": "swap_line_up" },
+    { "keys": ["ctrl+p"], "command": "move", "args": {"by": "lines", "forward": false} },
+    { "keys": ["ctrl+shift+p"], "command": "move", "args": {"by": "lines", "extend": true, "forward": false} },
+    { "keys": ["super+p"], "command": "move", "args": {"by": "stops", "empty_line": true, "forward": false} },
+    { "keys": ["super+shift+p"], "command": "move", "args": {"by": "stops", "empty_line": true, "extend": true, "forward": false} },
+    { "keys": ["super+m"], "command": "move_to", "args": {"to": "bol"} },
+    { "keys": ["super+shift+m"], "command": "move_to", "args": {"to": "bol", "extend": true} },
+    { "keys": ["ctrl+a"], "command": "move_to", "args": {"to": "bol"} },
+    { "keys": ["ctrl+shift+a"], "command": "move_to", "args": {"to": "bol", "extend": true} },
+    { "keys": ["ctrl+e"], "command": "move_to", "args": {"to": "hardeol"} },
+    { "keys": ["ctrl+shift+e"], "command": "move_to", "args": {"to": "eol", "extend": true} },
+    { "keys": ["ctrl+w"], "command": "prompt_select_workspace" },
+    { "keys": ["ctrl+d"], "command": "move", "args": {"by": "pages", "forward": true} },
+    { "keys": ["ctrl+u"], "command": "move", "args": {"by": "pages", "forward": false} },
+    { "keys": ["super+shift+,"], "command": "move_to", "args": {"to": "bof"} },
+    { "keys": ["super+shift+."], "command": "move_to", "args": {"to": "eof"} },
+    { "keys": ["super+alt+g"], "command": "find_under" },
+    { "keys": ["ctrl+alt+g"], "command": "find_all_under" },
+    { "keys": ["ctrl+shift+up"], "command": "select_lines", "args": {"forward": false} },
+    { "keys": ["ctrl+shift+down"], "command": "select_lines", "args": {"forward": true} },
+    { "keys": ["ctrl+shift+d"], "command": "noop" },
+    { "keys": ["alt+shift+up"], "command": "noop" },
+    { "keys": ["alt+shift+down"], "command": "noop" },
+    { "keys": ["ctrl+k","ctrl+b"], "command": "noop" },
+    { "keys": ["ctrl+k","ctrl+d"], "command": "noop" },
+    { "keys": ["ctrl+k","ctrl+p"], "command": "noop" },
+
+    // Run
+    {
+        "keys": ["ctrl+r"],
+        "command": "view_tester",
+        "args": {
+            "action": "make_opd",
+            "use_debugger": false
+        },
+        "context": [
+            {
+                "operand": "source.TestSyntax",
+                "operator": "not_equal",
+                "match_all": true,
+                "key": "selector"
+            }
+        ]
+    },
+
+    // Run
+    {
+        "keys": ["ctrl+r"],
+        "command": "test_manager",
+        "args": {
+            "action": "make_opd",
+            "load_session": true,
+            "use_debugger": false
+        },
+        "context": [
+            {
+                "operand": "source.TestSyntax",
+                "operator": "equal",
+                "match_all": true,
+                "key": "selector"
+            }
+        ]
+    },
+    
+]
