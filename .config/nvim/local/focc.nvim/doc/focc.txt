@@ -1,0 +1,67 @@
+*focc.txt*  FastOlympicCoding-compatible testing for Neovim
+
+                                                        *focc* *:Focc*
+:Focc [action] [test-number]
+    Run competitive-programming tests from compatible JSON files.
+    With no action, compile and run all tests. Numbers start at 1.
+
+    run_all          Compile and run all tests.
+    run N            Compile and run test N.
+    show             Display the last results.
+    reload           Reload tests after external changes.
+    add              Add a test through a JSON editor.
+    edit N           Edit a test. Ctrl-S or :FoccSave saves.
+    delete N         Delete a test.
+    clear            Delete all tests after confirmation.
+    accept N         Record the last output as correct.
+    reject N         Record the last output as incorrect.
+    move_up N        Move a test up.
+    move_down N      Move a test down.
+    stop             Cancel the active process.
+    interactive      Start a program with live stdin.
+    send             Send one input line.
+    eof              Close interactive stdin.
+    save_interactive Store captured input as a new test.
+    stress           Run generator, reference, and candidate.
+    stop_stress      Stop stress testing.
+    lint             Request compiler diagnostics.
+    snippets         Select and insert an algorithm snippet.
+    debug N          Debug a C++ test through configured nvim-dap.
+    debug_input_file Debug using input.txt beside the source.
+    debug_no_input   Debug with terminal input and no prepared stdin file.
+    receive [dir]    Receive Competitive Companion problems on port 12345.
+    stop_receive     Stop receiving problems.
+
+                                                        *focc-configuration*
+Configure the plugin with require("focc").setup(opts).
+For this LazyVim installation, edit lua/plugins/focc.lua.
+The plugin never reads Sublime global or user settings.
+See local/focc.nvim/README.md for the complete option table.
+
+                                                        *focc-compatibility*
+Test path: <source directory>/<tests_relative_dir>/<filename><suffix>.
+JSON fields: test, correct_answers, uncorrect_answers.
+Unknown fields remain intact. External changes block a save.
+Observed output is trimmed at both ends before answer comparison.
+If accepted answers exist, output matching none of them is rejected. Without an
+accepted answer, output is unknown unless it matches a recorded rejected answer.
+Judging does not automatically record mismatches in the shared test file.
+
+                                                        *focc-panel*
+The panel shows verdict counts and status badges with Input, Expected, and Actual
+sections. Empty stderr and recorded rejected answers are hidden by default.
+]t/[t jump to next/previous test; ]f/[f jump to next/previous failure.
+P toggles folding accepted tests; Tab overrides folding for the selected test.
+v toggles recorded rejected answers; D debugs the selected test; ? toggles help.
+Selection and scroll stay anchored to a test while earlier results grow.
+
+Competitive Companion imports samples and creates source files. Submission is
+not implemented. See README.md for destination layout and receiver settings.
+For Codeforces, AtCoder, and CodeChef, receive [dir] uses dir as the root without
+adding a judge folder. Paths are <contest-id>/<problem>.cpp. CodeChef uses problem
+codes, with Practice as the directory if no contest code is available. Single
+problem and contest downloads use the same mapping. Old files are not moved.
+Debugging requires an optional user-configured nvim-dap adapter.
+Use :checkhealth focc to check this installation.
+
+vim:tw=78:ts=8:noet:ft=help:norl:
