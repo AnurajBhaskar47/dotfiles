@@ -9,7 +9,7 @@
     run N            Compile and run test N.
     show             Display the last results.
     reload           Reload tests after external changes.
-    add              Add a test through a JSON editor.
+    add              Add a test through a multiline form.
     edit N           Edit a test. Ctrl-S or :FoccSave saves.
     delete N         Delete a test.
     clear            Delete all tests after confirmation.
@@ -29,7 +29,7 @@
     debug N          Debug a C++ test through configured nvim-dap.
     debug_input_file Debug using input.txt beside the source.
     debug_no_input   Debug with terminal input and no prepared stdin file.
-    receive [dir]    Receive Competitive Companion problems on port 12345.
+    receive [dir]    Receive current-source tests, or problem files under dir.
     stop_receive     Stop receiving problems.
 
                                                         *focc-configuration*
@@ -54,10 +54,34 @@ sections. Empty stderr and recorded rejected answers are hidden by default.
 P toggles folding accepted tests; Tab overrides folding for the selected test.
 v toggles recorded rejected answers; D debugs the selected test; ? toggles help.
 Selection and scroll stay anchored to a test while earlier results grow.
+Normal runtime errors show their termination signal when available. D repeats
+the selected test under the debugger; it does not preserve the original crash.
+
+                                                        *focc-crashes*
+Debug crashes open nvim-dap-ui if installed and show the adapter's stop reason.
+FOCC selects the nearest frame in the current source file when available.
+Select frames in Stacks to inspect variables in Scopes. The full stack remains
+available. Temporary test input remains until process exit/session termination.
+FOCC does not automatically resume or terminate execution after a crash stop.
+No automatic repetition, confirmation prompt, or core-dump analysis is provided.
+
+                                                        *focc-test-editor*
+Add/edit opens a multiline form in the bottom split. Enter literal text below
+Input, Correct answer, and Incorrect answer headings. Enter inserts a newline.
+Ctrl-S or :FoccSave saves; :q! cancels. Normal-mode Tab/Shift-Tab select fields.
+:FoccAnswerAdd correct|incorrect adds an answer; :FoccAnswerDelete removes the
+selected answer. A blank optional field creates no answer. Explicitly added
+empty answers remain valid. New/edited answers trim surrounding whitespace.
+Input, unchanged answers, and unknown JSON fields remain intact. Do not edit
+headings. The stored format remains FOCC JSON, including uncorrect_answers.
 
 Competitive Companion imports samples and creates source files. Submission is
 not implemented. See README.md for destination layout and receiver settings.
-For Codeforces, AtCoder, and CodeChef, receive [dir] uses dir as the root without
+Without dir, each request appends samples to the source active when the request
+is processed. Buffer changes change the target. FOCC panels use their associated
+source; unnamed/unsupported buffers reject imports. No source is created/saved.
+Whole contests require dir. Use receive . for cwd.
+For Codeforces, AtCoder, and CodeChef, receive dir uses dir as the root without
 adding a judge folder. Paths are <contest-id>/<problem>.cpp. CodeChef uses problem
 codes, with Practice as the directory if no contest code is available. Single
 problem and contest downloads use the same mapping. Old files are not moved.

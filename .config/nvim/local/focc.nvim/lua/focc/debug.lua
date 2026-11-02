@@ -43,7 +43,18 @@ function M.start(source, index, mode)
       file:close()
     end
     local key = "focc-" .. source
+    local detach_crash, defaults, previous_auto_continue
     local function cleanup()
+      if detach_crash then
+        detach_crash()
+        detach_crash = nil
+      end
+      if defaults then
+        if defaults.auto_continue_if_many_stopped == false then
+          defaults.auto_continue_if_many_stopped = previous_auto_continue
+        end
+        defaults = nil
+      end
       if temporary then
         vim.uv.fs_unlink(input)
         M.inputs[input] = nil
@@ -84,7 +95,15 @@ function M.start(source, index, mode)
       dap.listeners.after.event_initialized[key] = function(session)
         -- Also clean up on disconnect or adapter failure after initialization.
         session.on_close[key] = cleanup
+        -- nvim-dap must not automatically resume another stopped thread during
+        -- this FOCC session. Restore the adapter default when the session closes.
+        if not defaults then
+          defaults = dap.defaults[cfg.debug.adapter]
+          previous_auto_continue = rawget(defaults, "auto_continue_if_many_stopped")
+          defaults.auto_continue_if_many_stopped = false
+        end
       end
+      detach_crash = require("focc.crash").attach(dap, source, key)
       local launched, err = pcall(dap.run, {
         name = "FOCC " .. vim.fs.basename(source),
         type = cfg.debug.adapter,

@@ -18,7 +18,7 @@ No global keymaps change. Use command completion after `:Focc `.
 | `:Focc run 1` | Compile and run one test. Test numbers start at 1. |
 | `:Focc show` | Show the existing results without rerunning. |
 | `:Focc reload` | Reload tests after another editor changes them. |
-| `:Focc add` / `edit 1` | Edit a test as JSON. Ctrl-S or `:FoccSave` saves. |
+| `:Focc add` / `edit 1` | Edit a test in a multiline form. Ctrl-S or `:FoccSave` saves. |
 | `:Focc delete 1` / `clear` | Delete one test or clear all tests with confirmation. |
 | `:Focc accept 1` / `reject 1` | Remember the last observed output. |
 | `:Focc move_up 2` / `move_down 1` | Change test order. |
@@ -32,10 +32,12 @@ No global keymaps change. Use command completion after `:Focc `.
 | `:Focc debug 1` | Debug a C++ test through your configured nvim-dap adapter. |
 | `:Focc debug_input_file` | Debug using `input.txt` beside the source. |
 | `:Focc debug_no_input` | Debug with terminal stdin rather than a prepared file. |
-| `:Focc receive [directory]` | Listen for Competitive Companion problems/contests. |
+| `:Focc receive [directory]` | Receive tests for the current source, or create problem files under a directory. |
 | `:Focc stop_receive` | Stop the local receiver. |
 
 The results panel has buffer-local keys. `r` runs one test. `R` runs all tests.
+Single-test runs replace only that test's result and preserve other unchanged
+tests' verdicts, output, and timing. Running all tests clears the previous results.
 `a` adds, `e` edits, `d` deletes, `y` accepts, and `n` rejects output.
 `J` and `K` move a test. Tab folds a test. `x` stops. `q` hides the panel.
 `I` starts interactive input. `s` sends a line. `E` sends EOF. `S` saves captured input.
@@ -49,6 +51,31 @@ Selection and viewport stay anchored to the current test as earlier results grow
 individual test. `v` toggles recorded rejected answers, hidden by default.
 `D` debugs the selected test. `?` toggles the full shortcut help below the compact
 footer. Failed tests remain expanded unless you explicitly fold them.
+Normal crash results also show the termination signal, for example
+`[RUNTIME ERROR] SIGSEGV`. Timeout/cancellation labels retain priority. `D` starts
+a new debug execution of the selected test, not an inspection of the original run.
+
+### Test editor
+
+Add/edit opens one multiline form in the same bottom split as the previous JSON
+editor. Enter or paste literal text below Input, Correct answer, and Incorrect
+answer headings. Press Enter for a newline; no JSON escaping is needed. Input
+preserves whitespace and trailing newlines exactly. New or edited answers trim
+only surrounding whitespace, matching the existing output comparison. Unchanged
+answer strings and unknown JSON fields remain intact.
+
+`Ctrl-S` (normal or insert mode) and `:FoccSave` save and close the form. `:q!`
+cancels without saving. In normal mode, Tab / Shift-Tab move between fields;
+insert-mode Tab still inserts a tab. Leave headings unchanged. Saving refuses
+deleted or changed headings and external changes to the test file.
+
+An empty optional answer field creates no answer. To add another alternative, use
+`:FoccAnswerAdd correct` or `:FoccAnswerAdd incorrect`. The first invocation in an
+empty optional field enables that field as an answer, including an explicitly
+empty answer. Subsequent invocations add another field. Use `:FoccAnswerDelete`
+to remove the selected answer, rather than clearing it to an empty string.
+The UI calls rejected answers "Incorrect", but stores them in FOCC's original
+`uncorrect_answers` array. The saved format remains `.focc/<filename>:tests` JSON.
 
 ## File compatibility
 
@@ -142,9 +169,25 @@ Open a Codeforces problem or a contest's problem-list page and click the extensi
 plus button. A contest sends one request per problem; notifications show batch progress.
 The receiver continues listening until `:Focc stop_receive` or Neovim exit. It does
 not start automatically, and a second Neovim cannot bind the same port concurrently.
-Without a directory argument, imports go under Neovim's current working directory.
+With a directory argument, the receiver creates problem files under that directory.
+Use `:Focc receive .` to select Neovim's current working directory explicitly.
 
-For contest 1234, problem A creates:
+Without a directory argument, the receiver imports samples for the currently open
+named source file instead. For example, with `problem.cpp` open, `:Focc receive`
+creates or appends to `.focc/problem.cpp:tests` beside that source. It does not
+create a contest directory, rename/create/save the source, or overwrite existing
+tests. A named source buffer can still be unsaved. Identical input/answer pairs
+are not appended twice, and custom tests remain intact.
+
+Each request uses the source buffer active when Neovim processes that request.
+Switching buffers changes the destination for subsequent requests. A FOCC
+results/editor buffer uses its associated source file. An unnamed or unsupported
+active buffer rejects the import instead of reusing the previous source. Use an explicit
+destination directory. Current-file mode rejects multi-problem batches to prevent
+mixing a whole contest into one file; use an explicit directory for contest imports.
+Stop the receiver before changing between current-buffer and explicit-directory modes.
+
+With an explicit destination, contest 1234 problem A creates:
 
 ```text
 <destination>/1234/A.cpp
@@ -225,6 +268,33 @@ The DAP UI shows variables, watches, and stack frames. Stop on entry can be
 disabled with `debug.stop_on_entry = false` without disabling breakpoints.
 CodeLLDB's initial entry stop can be in the system loader rather than `main`.
 Continue to your source breakpoint; missing loader source is not a build failure.
+
+### Live crash inspection
+
+When a debug execution stops on an exception (including SIGSEGV or SIGABRT), FOCC
+opens nvim-dap-ui if installed and shows the stop description. Its REPL includes
+the stop description and the nearest stack frame in the current source file.
+FOCC selects that source frame when available; the full stack remains accessible,
+including system-library frames. Without a source frame, nvim-dap retains the
+adapter's selected frame. Missing debug information can limit variable inspection.
+
+Select frames in the DAP UI Stacks pane to inspect their variables in Scopes.
+LazyVim also provides `<leader>dj` / `<leader>dk` for frame selection and
+`<leader>de` for expression evaluation. Use `<leader>dt` to terminate explicitly.
+FOCC never automatically resumes or kills the process on a crash stop. It disables
+nvim-dap's automatic continuation of additional stopped threads during this session
+and restores the previous adapter default when the session closes. Temporary test
+stdin stays available until process exit or debugger termination.
+
+Normal test runs show runtime errors and signals but do not launch a debugger.
+`D` or `:Focc debug N` repeats the test under CodeLLDB; the program must reproduce
+the crash. No automatic repetition, confirmation prompt, or core-dump analysis is
+implemented. Debugging and crash inspection do not modify shared test JSON.
+
+Live fatal-signal checks: `nvim --headless -u NONE -l tests/crash.lua` from the
+plugin directory. This test requires Mason CodeLLDB, nvim-dap, nvim-dap-ui, and
+nvim-nio. It checks SIGSEGV/SIGABRT, opening the UI, source locations, variables,
+frame selection, retained input, and cleanup after explicit termination.
 
 An optional live CodeLLDB check is `nvim --headless -u NONE -l tests/debug.lua`
 from this plugin directory. It requires the installed nvim-dap and Mason CodeLLDB.

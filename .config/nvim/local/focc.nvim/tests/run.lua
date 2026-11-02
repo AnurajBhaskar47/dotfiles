@@ -39,6 +39,16 @@ local function invoke(cmd, opts)
   end)
   return result, task
 end
+local function form_row(buf, index)
+  local form = require("focc.editor").forms[buf]
+  local ns = vim.api.nvim_get_namespaces()["focc-editor"]
+  return vim.api.nvim_buf_get_extmark_by_id(buf, ns, form.fields[index].mark, {})[1]
+end
+local function form_set(buf, index, lines)
+  local form = require("focc.editor").forms[buf]
+  local last = form.fields[index + 1] and form_row(buf, index + 1) or vim.api.nvim_buf_line_count(buf)
+  vim.api.nvim_buf_set_lines(buf, form_row(buf, index) + 1, last, false, lines)
+end
 
 config.setup({ tests_relative_dir = ".focc" })
 test("configuration validation", function()
@@ -274,11 +284,156 @@ test("UI and editing command registration", function()
   require("focc.ui").show(session)
   assert(vim.bo.filetype == "focc")
   require("focc.ui").edit(path, data, nil, function() end)
-  assert(vim.bo.filetype == "json" and vim.fn.exists(":FoccSave") == 2)
-  vim.api.nvim_buf_set_lines(0, 0, -1, false, { '{"test":"3\\n","correct_answers":["6"],"extra":null}' })
+  assert(vim.bo.filetype == "focc-edit" and vim.fn.exists(":FoccSave") == 2)
+  local buf = vim.api.nvim_get_current_buf()
+  form_set(buf, 1, { "3", "" })
+  form_set(buf, 2, { "6" })
   vim.cmd("FoccSave")
   local loaded = store.load(path)
-  assert(loaded.tests[1].test == "3\n" and loaded.tests[1].extra == vim.NIL)
+  assert(loaded.tests[1].test == "3\n" and loaded.tests[1].correct_answers[1] == "6")
+end)
+test("multiline form preserves exact strings, alternatives, and unknown metadata", function()
+  local path = root .. "/form/roundtrip.cpp"
+  local data = store.load(path)
+  local values = { "  1 2\n3\n\n", "answer\n", "", "── Input ──\n\\n\t雪", "bad\noutput\n" }
+  data.tests = {
+    {
+      test = values[1],
+      correct_answers = { values[2], values[3], values[4] },
+      uncorrect_answers = { values[5] },
+      extra = { null = vim.NIL, note = "preserve" },
+    },
+  }
+  store.save(data)
+  local ui = require("focc.ui")
+  local original = vim.deepcopy(data.tests[1])
+  local completed = 0
+  local buf = ui.edit(path, data, 1, function()
+    completed = completed + 1
+  end)
+  assert(vim.api.nvim_buf_get_name(buf):match("^focc://edit/"))
+  local content = table.concat(vim.api.nvim_buf_get_lines(buf, 0, -1, false), "\n")
+  assert(content:find(values[1], 1, true) and content:find(values[4], 1, true))
+  vim.cmd("FoccSave")
+  assert(completed == 1 and vim.deep_equal(store.load(path).tests[1], original))
+  assert(require("focc.editor").forms[buf] == nil)
+  buf = ui.edit(path, data, 1, function()
+    completed = completed + 1
+  end)
+  form_set(buf, 1, { "new input", "second line", "" })
+  form_set(buf, 2, { "first output", "second output", "" })
+  form_set(buf, 5, { "different wrong output" })
+  vim.cmd("FoccSave")
+  local updated = store.load(path).tests[1]
+  assert(updated.test == "new input\nsecond line\n")
+  assert(updated.correct_answers[1] == "first output\nsecond output")
+  assert(updated.correct_answers[2] == "" and updated.correct_answers[3] == values[4])
+  assert(updated.uncorrect_answers[1] == "different wrong output")
+  assert(vim.deep_equal(updated.extra, original.extra))
+  assert(store.answer(updated, "first output\nsecond output\n") == "accepted")
+end)
+test("form answer controls and save shortcuts", function()
+  local ui = require("focc.ui")
+  local path = root .. "/form/controls.cpp"
+  local data = store.load(path)
+  local buf = ui.edit(path, data, nil, function() end)
+  assert(vim.fn.exists(":FoccAnswerAdd") == 2 and vim.fn.exists(":FoccAnswerDelete") == 2)
+  local function key(lhs)
+    for _, mapping in ipairs(vim.api.nvim_buf_get_keymap(buf, "n")) do
+      if mapping.lhs == lhs then
+        mapping.callback()
+        return
+      end
+    end
+    error("missing form key: " .. lhs)
+  end
+  key("<Tab>")
+  assert(vim.api.nvim_win_get_cursor(0)[1] == form_row(buf, 2) + 2)
+  key("<S-Tab>")
+  assert(vim.api.nvim_win_get_cursor(0)[1] == form_row(buf, 1) + 2)
+  form_set(buf, 3, {})
+  key("<S-Tab>")
+  assert(
+    vim.api.nvim_win_get_cursor(0)[1] == form_row(buf, 3) + 2,
+    "Navigation must restore an editable line in an empty field"
+  )
+  for _, mapping in ipairs(vim.api.nvim_buf_get_keymap(buf, "i")) do
+    assert(mapping.lhs ~= "<Tab>", "Insert-mode Tab must remain literal")
+  end
+  vim.cmd("FoccAnswerAdd correct")
+  assert(#require("focc.editor").forms[buf].fields == 3)
+  -- This explicitly adds an empty correct answer. A untouched placeholder does not.
+  vim.cmd("FoccAnswerAdd correct")
+  assert(#require("focc.editor").forms[buf].fields == 4)
+  form_set(buf, 3, { "alternative", "two lines" })
+  vim.cmd("FoccAnswerAdd incorrect")
+  form_set(buf, 4, { "wrong", "output" })
+  local mappings = vim.api.nvim_buf_get_keymap(buf, "n")
+  for _, mapping in ipairs(mappings) do
+    if mapping.lhs == "<C-S>" or mapping.lhs == "<C-s>" then
+      mapping.callback()
+      break
+    end
+  end
+  assert(not vim.api.nvim_buf_is_valid(buf), "Ctrl-S must save and close the form")
+  local test = store.load(path).tests[1]
+  assert(test.test == "" and vim.deep_equal(test.correct_answers, { "", "alternative\ntwo lines" }))
+  assert(vim.deep_equal(test.uncorrect_answers, { "wrong\noutput" }))
+  buf = ui.edit(path, data, 1, function() end)
+  vim.api.nvim_win_set_cursor(0, { form_row(buf, 2) + 2, 0 })
+  vim.cmd("FoccAnswerDelete")
+  vim.api.nvim_win_set_cursor(0, { form_row(buf, 2) + 2, 0 })
+  vim.cmd("FoccAnswerDelete")
+  vim.cmd("FoccSave")
+  assert(#store.load(path).tests[1].correct_answers == 0)
+  local fresh = store.load(root .. "/form/blank.cpp")
+  ui.edit(fresh.source, fresh, nil, function() end)
+  vim.cmd("FoccSave")
+  assert(
+    store.load(fresh.source).tests[1].correct_answers == nil,
+    "Blank optional fields must not create accepted answers"
+  )
+end)
+test("form cancellation, external changes, and damaged headings prevent data loss", function()
+  local ui = require("focc.ui")
+  local path = root .. "/form/safety.cpp"
+  local data = store.load(path)
+  data.tests = { { test = "original", correct_answers = { "answer" } } }
+  store.save(data)
+  rejected(function()
+    ui.edit(path, data, 99, function() end)
+  end)
+  local original = store.read(data.path)
+  local buf = ui.edit(path, data, 1, function()
+    error("Must not save")
+  end)
+  form_set(buf, 1, { "cancelled edit" })
+  vim.cmd("q!")
+  assert(store.read(data.path) == original and require("focc.editor").forms[buf] == nil)
+  buf = ui.edit(path, data, 1, function()
+    error("Must not save")
+  end)
+  local row = form_row(buf, 2)
+  vim.api.nvim_buf_set_lines(buf, row, row + 1, false, { "damaged heading" })
+  pcall(vim.cmd, "FoccSave")
+  assert(vim.api.nvim_buf_is_valid(buf) and store.read(data.path) == original)
+  vim.api.nvim_buf_delete(buf, { force = true })
+  buf = ui.edit(path, data, 1, function()
+    error("Must not save")
+  end)
+  row = form_row(buf, 2)
+  vim.api.nvim_buf_set_lines(buf, row, row + 1, false, {})
+  pcall(vim.cmd, "FoccSave")
+  assert(vim.api.nvim_buf_is_valid(buf) and store.read(data.path) == original)
+  vim.api.nvim_buf_delete(buf, { force = true })
+  buf = ui.edit(path, data, 1, function()
+    error("Must not save")
+  end)
+  write(data.path, '[{"test":"external"}]')
+  form_set(buf, 1, { "local" })
+  pcall(vim.cmd, "FoccSave")
+  assert(vim.api.nvim_buf_is_valid(buf) and store.load(path).tests[1].test == "external")
+  vim.api.nvim_buf_delete(buf, { force = true })
 end)
 test("results panel summary, navigation, folding, and viewport anchors", function()
   local ui = require("focc.ui")
@@ -423,7 +578,19 @@ test("debug launch modes build separate executables and preserve tests", functio
   local launched
   local dap = {
     adapters = { codelldb = {} },
-    listeners = { after = { event_terminated = {}, event_exited = {}, event_initialized = {} } },
+    listeners = {
+      before = { event_stopped = {} },
+      after = {
+        event_terminated = {},
+        event_exited = {},
+        event_initialized = {},
+        event_stopped = {},
+        stackTrace = {},
+        event_continued = {},
+      },
+    },
+    defaults = { codelldb = { auto_continue_if_many_stopped = true } },
+    repl = { append = function() end },
     session = function()
       return nil
     end,
@@ -451,10 +618,14 @@ test("debug launch modes build separate executables and preserve tests", functio
   end
   local value = launch("debug", 1)
   local input = value.stdio[1]
+  dap.listeners.after.event_initialized["focc-" .. path]({ on_close = {} })
+  assert(dap.defaults.codelldb.auto_continue_if_many_stopped == false)
   assert(store.read(input) == "12\n" and value.stdio[2] == vim.NIL)
   local result = invoke({ value.program }, { input = store.read(input) })
   assert(result.stdout == "24")
   dap.listeners.after.event_exited["focc-" .. path]()
+  assert(dap.defaults.codelldb.auto_continue_if_many_stopped == true)
+  assert(dap.listeners.before.event_stopped["focc-" .. path] == nil)
   assert(not vim.uv.fs_stat(input))
   write(vim.fs.joinpath(vim.fs.dirname(path), "input.txt"), "9\n")
   value = launch("debug_input_file")
@@ -470,6 +641,102 @@ test("debug launch modes build separate executables and preserve tests", functio
   assert(store.read(data.path) == original)
   package.loaded.dap = previous
   config.setup({ tests_relative_dir = ".focc" })
+end)
+test("crash listeners preserve stops and select source frames", function()
+  local previous_ui = package.loaded.dapui
+  local opened, message, selected = 0, "", nil
+  package.loaded.dapui = {
+    open = function()
+      opened = opened + 1
+    end,
+  }
+  local dap = {
+    listeners = {
+      before = { event_stopped = {} },
+      after = { event_stopped = {}, stackTrace = {}, event_continued = {} },
+    },
+    repl = {
+      append = function(text)
+        message = message .. text
+      end,
+    },
+  }
+  local source = root .. "/crash-listeners/main.cpp"
+  local session = {
+    _frame_set = function(_, frame)
+      selected = frame
+    end,
+  }
+  local crash = require("focc.crash")
+  local cleanup = crash.attach(dap, source, "test-crash")
+  local function stopped(reason, description)
+    dap.listeners.before.event_stopped["test-crash"](
+      session,
+      { reason = reason, description = description, threadId = 1 }
+    )
+    dap.listeners.after.event_stopped["test-crash"](session)
+  end
+  stopped("breakpoint", nil)
+  assert(opened == 0 and crash.stops[source] == nil)
+  stopped("exception", "signal SIGSTOP")
+  assert(opened == 0 and crash.stops[source] == nil)
+  stopped("exception", "signal SIGABRT")
+  dap.listeners.after.event_stopped["test-crash"](session)
+  assert(opened == 1 and crash.stops[source].signal == "SIGABRT")
+  assert(message:find("Execution remains stopped", 1, true))
+  local frames = {
+    { id = 10, line = 1, name = "abort", source = { path = "/lib/abort.c" } },
+    { id = 11, line = 8, name = "crash", source = { path = source } },
+  }
+  dap.listeners.after.stackTrace["test-crash"](session, nil, { stackFrames = frames }, { threadId = 1 })
+  assert(selected == frames[2] and #crash.stops[source].frames == 2)
+  assert(crash.stops[source].source_frame == frames[2])
+  dap.listeners.after.event_continued["test-crash"](session)
+  assert(crash.stops[source] == nil)
+  stopped("exception", "signal SIGSEGV")
+  dap.listeners.after.stackTrace["test-crash"](session, nil, { stackFrames = { frames[1] } }, { threadId = 1 })
+  assert(crash.stops[source].source_frame == nil, "A missing source frame must not prevent crash inspection")
+  cleanup()
+  assert(crash.stops[source] == nil and dap.listeners.after.stackTrace["test-crash"] == nil)
+  package.loaded.dapui = previous_ui
+end)
+test("normal crash results display signals without starting a debugger", function()
+  config.setup({ tests_relative_dir = ".focc" })
+  local path = root .. "/signals/main.py"
+  write(
+    path,
+    [[import os, resource
+resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
+signal = int(input())
+if signal:
+    os.kill(os.getpid(), signal)
+print('ok')
+]]
+  )
+  local data = store.load(path)
+  data.tests = { { test = "11\n" }, { test = "6\n" }, { test = "0\n", correct_answers = { "ok" } } }
+  store.save(data)
+  local original = store.read(data.path)
+  local session = runner.run(path)
+  wait(function()
+    return session.status == "finished"
+  end)
+  assert(session.results[1].signal == vim.uv.constants.SIGSEGV)
+  assert(session.results[2].signal == vim.uv.constants.SIGABRT)
+  assert(session.results[3].answer == "accepted", "Normal run_all must continue after a crash")
+  local signals = require("focc.signals")
+  assert(signals.name(0) == nil and signals.name(nil) == nil)
+  assert(signals.name(9999) == "signal 9999")
+  local ui = require("focc.ui")
+  ui.show(session)
+  local view = ui.views[path]
+  local output = table.concat(vim.api.nvim_buf_get_lines(view.buf, 0, -1, false), "\n")
+  assert(output:find("[RUNTIME ERROR]  SIGSEGV", 1, true))
+  assert(output:find("[RUNTIME ERROR]  SIGABRT", 1, true))
+  session.results[1].reason = "timeout"
+  ui.render(session)
+  assert(view.headers[1].status == "timeout", "Timeouts must not be relabeled as crashes")
+  assert(store.read(data.path) == original)
 end)
 test("Companion imports preserve solutions and custom tests", function()
   config.setup({ tests_relative_dir = ".focc" })
@@ -562,6 +829,222 @@ test("Companion judge paths are stable for individual and contest downloads", fu
   assert(not vim.uv.fs_stat(destination .. "/Codeforces"))
   assert(not vim.uv.fs_stat(destination .. "/AtCoder"))
   assert(not vim.uv.fs_stat(destination .. "/CodeChef"))
+end)
+test("single-test reruns preserve other results and full runs reset them", function()
+  config.setup({ tests_relative_dir = ".focc" })
+  local path = root .. "/single-rerun/main.py"
+  write(path, "import sys\nvalue = input()\nif value == 'crash': sys.exit(1)\nprint(value)\n")
+  local data = store.load(path)
+  data.tests = {
+    { test = "ok\n", correct_answers = { "ok" } },
+    { test = "wrong\n", correct_answers = { "expected" } },
+    { test = "crash\n" },
+    { test = "untested\n", correct_answers = { "untested" } },
+  }
+  store.save(data)
+  local session = runner.run(path)
+  wait(function()
+    return session.status == "finished"
+  end)
+  assert(session.results[1].answer == "accepted" and session.results[2].answer == "rejected")
+  assert(session.results[3].code == 1)
+  session.results[4] = nil
+  local previous = session
+  local ui = require("focc.ui")
+  ui.show(session)
+  session = runner.run(path, 2, function(value)
+    ui.render(value)
+  end)
+  assert(session.results[2] == nil, "The selected test must clear its old verdict during execution")
+  assert(session.results[1] == previous.results[1] and session.results[3] == previous.results[3])
+  assert(session.results[4] == nil)
+  wait(function()
+    return session.status == "finished"
+  end)
+  assert(session.results[2] ~= previous.results[2] and session.results[2].answer == "rejected")
+  assert(session.results[1] == previous.results[1] and session.results[3] == previous.results[3])
+  local headers = ui.views[path].headers
+  assert(headers[1].status == "accepted" and headers[2].status == "rejected")
+  assert(headers[3].status == "runtime error" and headers[4].status == "not run")
+  previous = session
+  session = runner.run(path, 4)
+  wait(function()
+    return session.status == "finished"
+  end)
+  assert(session.results[4].answer == "accepted")
+  for i = 1, 3 do
+    assert(session.results[i] == previous.results[i])
+  end
+  session = runner.run(path)
+  assert(next(session.results) == nil, "A full run must reset all old results")
+  wait(function()
+    return session.status == "finished"
+  end)
+  -- Externally edited tests must not inherit stale verdicts by index.
+  data.tests[1].test = "changed\n"
+  store.save(data)
+  session = runner.run(path, 2)
+  assert(session.results[1] == nil and session.results[3] ~= nil)
+  wait(function()
+    return session.status == "finished"
+  end)
+end)
+test("Companion current-source imports preserve code and append shared tests", function()
+  config.setup({ tests_relative_dir = ".focc" })
+  local companion = require("focc.companion")
+  local source = root .. "/current-source/problem.py"
+  write(source, "# existing solution\n")
+  local data = store.load(source)
+  data.tests = { { test = "custom", extra = "preserve" } }
+  store.save(data)
+  local active = { source = source, store = data, status = "ready", results = { { stdout = "old" } } }
+  runner.sessions[source] = active
+  local payload = {
+    name = "A - Example",
+    url = "https://atcoder.jp/contests/abc400/tasks/abc400_a",
+    tests = { { input = "3\n", output = "6\n" } },
+    batch = { id = "single", size = 1 },
+  }
+  local result = companion.import(payload, nil, source)
+  assert(result.source == source and result.added == 1)
+  assert(store.read(source) == "# existing solution\n")
+  assert(store.path(source) == root .. "/current-source/.focc/problem.py:tests")
+  local tests = store.load(source).tests
+  assert(#tests == 2 and tests[1].extra == "preserve" and tests[2].correct_answers[1] == "6")
+  assert(active.status == "ready" and #active.results == 0 and #active.store.tests == 2)
+  assert(companion.import(payload, nil, source).added == 0)
+  assert(not vim.uv.fs_stat(root .. "/current-source/abc400"))
+  active.status = "running"
+  rejected(function()
+    companion.import(payload, nil, source)
+  end)
+  active.status = "ready"
+  payload.batch.size = 2
+  local original = store.read(store.path(source))
+  rejected(function()
+    companion.import(payload, nil, source)
+  end)
+  assert(store.read(store.path(source)) == original)
+  payload.batch = nil
+  local unsaved = root .. "/current-source/unsaved.cpp"
+  assert(companion.import(payload, nil, unsaved).source == unsaved)
+  assert(not vim.uv.fs_stat(unsaved) and #store.load(unsaved).tests == 1)
+  local linked = root .. "/current-source/linked.cpp"
+  assert(vim.uv.fs_symlink(source, linked))
+  rejected(function()
+    companion.import(payload, nil, linked)
+  end)
+  assert(not vim.uv.fs_stat(store.path(linked)))
+end)
+test("Companion receiver follows active buffers for each HTTP import", function()
+  local probe = vim.uv.new_tcp()
+  assert(probe:bind("127.0.0.1", 0))
+  local port = probe:getsockname().port
+  probe:close()
+  config.setup({ tests_relative_dir = ".focc", companion = { port = port } })
+  local companion = require("focc.companion")
+  local source = root .. "/pinned-source/problem.cpp"
+  write(source, "// on disk\n")
+  local buf = vim.api.nvim_create_buf(true, false)
+  vim.api.nvim_buf_set_name(buf, source)
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "// unsaved edits" })
+  vim.api.nvim_set_current_buf(buf)
+  vim.cmd("Focc receive")
+  assert(companion.current_buffer and companion.root == nil)
+  local other = vim.api.nvim_create_buf(true, false)
+  local other_source = root .. "/pinned-source/other.cpp"
+  vim.api.nvim_buf_set_name(other, other_source)
+  local function send_samples(expected)
+    local result = invoke({
+      "python",
+      "-c",
+      [[
+import socket, json, sys
+def send(problem):
+    body = json.dumps(problem).encode()
+    with socket.create_connection(('127.0.0.1', int(sys.argv[1])), timeout=5) as sock:
+        sock.sendall(b'POST / HTTP/1.1\r\nContent-Length: ' + str(len(body)).encode() + b'\r\n\r\n' + body)
+        response = b''
+        while True:
+            part = sock.recv(8192)
+            if not part: break
+            response += part
+        return response.split(b'\r\n')[0]
+problem = {'name': 'A. Example', 'url': 'https://codeforces.com/contest/987654/problem/A',
+           'tests': [{'input': '2\n', 'output': '4\n'}], 'batch': {'id': 'single', 'size': 1}}
+assert sys.argv[2].encode() in send(problem)
+if sys.argv[2] == '400': sys.exit(0)
+assert b'200' in send(problem)
+problem['tests'] = [{'input': '7\n', 'output': '14\n'}]
+assert b'200' in send(problem)
+problem['batch']['size'] = 2
+assert b'400' in send(problem)
+]],
+      tostring(port),
+      expected or "200",
+    }, { timeout_ms = 15000 })
+    assert(result.code == 0, result.stderr)
+  end
+  send_samples()
+  assert(#store.load(source).tests == 2)
+  vim.api.nvim_set_current_buf(other)
+  send_samples()
+  assert(#store.load(other_source).tests == 2)
+  assert(not vim.uv.fs_stat(other_source), "Import must not save an unsaved source")
+  local panel = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_name(panel, "focc://results/receiver")
+  vim.b[panel].focc_source = source
+  vim.api.nvim_set_current_buf(panel)
+  send_samples()
+  assert(#store.load(source).tests == 2, "FOCC panels must resolve their associated source")
+  vim.api.nvim_buf_delete(panel, { force = true })
+  local invalid = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_set_current_buf(invalid)
+  send_samples("400")
+  vim.api.nvim_buf_set_name(invalid, root .. "/pinned-source/unsupported.txt")
+  send_samples("400")
+  assert(not vim.uv.fs_stat(store.path(root .. "/pinned-source/unsupported.txt")))
+  assert(#store.load(source).tests == 2 and #store.load(other_source).tests == 2)
+  vim.api.nvim_set_current_buf(buf)
+  send_samples()
+  vim.cmd("Focc stop_receive")
+  assert(companion.current_buffer == nil and companion.root == nil)
+  assert(#store.load(source).tests == 2)
+  assert(store.read(source) == "// on disk\n" and vim.bo[buf].modified)
+  assert(vim.api.nvim_buf_get_lines(buf, 0, -1, false)[1] == "// unsaved edits")
+  assert(not vim.uv.fs_stat(other_source) and vim.uv.fs_stat(store.path(other_source)))
+  assert(not vim.uv.fs_stat(root .. "/pinned-source/987654"))
+  vim.api.nvim_buf_delete(buf, { force = true })
+  vim.api.nvim_buf_delete(other, { force = true })
+  vim.api.nvim_buf_delete(invalid, { force = true })
+  config.setup({ tests_relative_dir = ".focc" })
+end)
+test("Companion current-file mode resolves FOCC buffers and rejects unnamed sources", function()
+  local probe = vim.uv.new_tcp()
+  assert(probe:bind("127.0.0.1", 0))
+  local port = probe:getsockname().port
+  probe:close()
+  config.setup({ tests_relative_dir = ".focc", companion = { port = port } })
+  local companion = require("focc.companion")
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_set_current_buf(buf)
+  rejected(function()
+    companion.start()
+  end)
+  assert(not companion.server)
+  vim.api.nvim_buf_set_name(buf, root .. "/unsupported.txt")
+  rejected(function()
+    companion.start()
+  end)
+  assert(not companion.server)
+  vim.api.nvim_buf_set_name(buf, "focc://results/test")
+  vim.b[buf].focc_source = root .. "/associated.cpp"
+  companion.start()
+  assert(companion.current_buffer and companion.root == nil)
+  companion.stop()
+  assert(not vim.uv.fs_stat(root .. "/associated.cpp"))
+  vim.api.nvim_buf_delete(buf, { force = true })
+  config.setup({ tests_relative_dir = ".focc" })
 end)
 test("Companion HTTP listener handles split POSTs and rejects bad requests", function()
   local probe = vim.uv.new_tcp()

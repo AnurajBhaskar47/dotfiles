@@ -24,7 +24,7 @@ end
 local function status(session, index)
   local result = session.results[index]
   if result then
-    return result.reason or (result.code ~= 0 and "runtime error" or result.answer)
+    return result.reason or ((result.code ~= 0 or (result.signal or 0) ~= 0) and "runtime error" or result.answer)
   end
   return session.status == "running" and session.current == index and "running" or "not run"
 end
@@ -212,6 +212,10 @@ function M.render(session)
     local prefix = string.format("%s Test %d  ", folded and "▸" or "▾", index)
     local badge = "[" .. label:upper() .. "]"
     local timing = result and string.format("  %.1f ms", result.time_ms) or ""
+    local signal = result and require("focc.signals").name(result.signal)
+    if signal then
+      timing = "  " .. signal .. timing
+    end
     if result and result.code ~= 0 then
       timing = timing .. string.format("  exit %d", result.code)
     end
@@ -290,39 +294,7 @@ function M.render(session)
 end
 
 function M.edit(source, data, index, done)
-  local test = index and data.tests[index] or { test = "" }
-  assert(test, "FOCC: test number does not exist")
-  local buf = vim.api.nvim_create_buf(false, true)
-  vim.bo[buf].bufhidden = "wipe"
-  vim.bo[buf].filetype = "json"
-  vim.b[buf].focc_source = source
-  vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(vim.json.encode(test), "\n"))
-  vim.cmd("botright split")
-  vim.api.nvim_win_set_buf(0, buf)
-  vim.api.nvim_buf_set_name(buf, "focc://edit/" .. buf)
-  local function save()
-    local ok, err = pcall(function()
-      local replacement = vim.json.decode(table.concat(vim.api.nvim_buf_get_lines(buf, 0, -1, false), "\n"))
-      require("focc.store").validate({ replacement })
-      local updated = vim.deepcopy(data.tests)
-      if index then
-        updated[index] = replacement
-      else
-        updated[#updated + 1] = replacement
-      end
-      local candidate = { source = data.source, path = data.path, original = data.original, tests = updated }
-      require("focc.store").save(candidate)
-      data.tests, data.original = candidate.tests, candidate.original
-      vim.api.nvim_buf_delete(buf, { force = true })
-      done()
-    end)
-    if not ok then
-      vim.notify(tostring(err), vim.log.levels.ERROR)
-    end
-  end
-  vim.keymap.set({ "n", "i" }, "<C-s>", save, { buffer = buf, desc = "Save FOCC test" })
-  vim.api.nvim_buf_create_user_command(buf, "FoccSave", save, {})
-  vim.notify("Edit test JSON. Use Ctrl-S or :FoccSave to save. :q! cancels.")
+  return require("focc.editor").open(source, data, index, done)
 end
 
 return M

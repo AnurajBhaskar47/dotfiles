@@ -85,7 +85,7 @@ local function create(path, content)
   return true
 end
 
-function M.import(payload, root)
+function M.import(payload, root, target_source)
   local cfg = require("focc.config").values
   assert(
     type(payload) == "table" and type(payload.name) == "string" and payload.name ~= "",
@@ -115,9 +115,24 @@ function M.import(payload, root)
       "FOCC: invalid batch"
     )
   end
-  local contest, problem = problem_path(payload)
-  local dest = vim.fs.joinpath(root, contest)
-  local source = vim.fs.joinpath(dest, problem .. "." .. cfg.companion.extension)
+  local source, dest
+  if target_source then
+    assert(not root, "FOCC: choose either a destination directory or a source file")
+    assert(
+      not batch or batch.size == 1,
+      "FOCC: use :Focc receive <directory> for a whole contest. Current-file mode accepts single problems only."
+    )
+    source = vim.fs.normalize(vim.fn.fnamemodify(target_source, ":p"))
+    require("focc.config").language(source)
+    local stat = uv.fs_lstat(source)
+    assert(not stat or stat.type == "file", "FOCC: refusing non-file source target")
+    dest = vim.fs.dirname(source)
+  else
+    assert(root, "FOCC: provide a destination directory or a source file")
+    local contest, problem = problem_path(payload)
+    dest = vim.fs.joinpath(root, contest)
+    source = vim.fs.joinpath(dest, problem .. "." .. cfg.companion.extension)
+  end
   local active = require("focc.runner").sessions[source]
   assert(
     not active or not vim.tbl_contains({ "running", "compiling", "interactive" }, active.status),
@@ -144,7 +159,9 @@ function M.import(payload, root)
       added = added + 1
     end
   end
-  create(source, cfg.companion.template)
+  if not target_source then
+    create(source, cfg.companion.template)
+  end
   if added > 0 or data.original == nil then
     store.save(data)
   end
@@ -174,12 +191,27 @@ function M.stop()
     close()
   end
   M.clients, M.batches = {}, {}
+  M.root, M.current_buffer = nil, nil
+end
+
+local function active_source()
+  local path = vim.b.focc_source or vim.api.nvim_buf_get_name(0)
+  assert(path ~= "" and not path:match("^%w+://"), "FOCC: open a named source file or use :Focc receive <directory>")
+  local source = vim.fs.normalize(vim.fn.fnamemodify(path, ":p"))
+  require("focc.config").language(source)
+  local stat = uv.fs_lstat(source)
+  assert(not stat or stat.type == "file", "FOCC: refusing non-file source target")
+  return source
 end
 
 function M.start(root)
   assert(not M.server, "FOCC: receiver already running; use :Focc stop_receive first")
-  root = vim.fs.normalize(vim.fn.fnamemodify(vim.fn.expand(root or vim.fn.getcwd()), ":p"))
-  directory(root)
+  if root then
+    root = vim.fs.normalize(vim.fn.fnamemodify(vim.fn.expand(root), ":p"))
+    directory(root)
+  else
+    active_source()
+  end
   local cfg = require("focc.config").values.companion
   local server = uv.new_tcp()
   local bound, bind_err = server:bind("127.0.0.1", cfg.port)
@@ -304,7 +336,10 @@ function M.start(root)
           return
         end
         local success, result = pcall(function()
-          return M.import(vim.json.decode(body), root)
+          -- Resolve once per request on Neovim's main loop. Never reuse a
+          -- previous buffer if the active buffer is no longer a valid source.
+          local target_source = not root and active_source() or nil
+          return M.import(vim.json.decode(body), root, target_source)
         end)
         if not success then
           reply("400 Bad Request", "Import failed")
@@ -340,9 +375,14 @@ function M.start(root)
     server:close()
     error(tostring(listen_err))
   end
-  M.server, M.root = server, root
+  M.server, M.root, M.current_buffer = server, root, not root
+  local destination = root or "tests for the active source buffer"
   vim.notify(
-    "FOCC: listening on 127.0.0.1:" .. cfg.port .. " → " .. root .. ". Click Competitive Companion's plus button."
+    "FOCC: listening on 127.0.0.1:"
+      .. cfg.port
+      .. " → "
+      .. destination
+      .. ". Click Competitive Companion's plus button."
   )
 end
 

@@ -29,7 +29,7 @@ function M.check()
   local companion = require("focc.companion")
   vim.health.info("Competitive Companion port: " .. cfg.companion.port .. " (loopback only)")
   if companion.server then
-    vim.health.ok("Receiver active: " .. companion.root)
+    vim.health.ok("Receiver active: " .. (companion.root or "tests for the active source buffer"))
   else
     vim.health.info("Start imports with :Focc receive [directory]")
   end

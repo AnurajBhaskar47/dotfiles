@@ -18,8 +18,19 @@ function M.run(source, index, update, interactive)
   if index then
     assert(data.tests[index], "FOCC: test number does not exist")
   end
-  M.stop(M.sessions[source])
-  local session = { source = source, store = data, results = {}, status = "compiling", update = update }
+  local previous = M.sessions[source]
+  local results = {}
+  if index and previous then
+    for i, result in pairs(previous.results) do
+      -- Keep completed results for unchanged tests, but clear the selected
+      -- test immediately so its old verdict is not shown during the rerun.
+      if i ~= index and vim.deep_equal(previous.store.tests[i], data.tests[i]) then
+        results[i] = result
+      end
+    end
+  end
+  M.stop(previous)
+  local session = { source = source, store = data, results = results, status = "compiling", update = update }
   M.sessions[source] = session
   local function notify()
     if update then
