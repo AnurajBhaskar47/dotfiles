@@ -76,6 +76,9 @@ empty answer. Subsequent invocations add another field. Use `:FoccAnswerDelete`
 to remove the selected answer, rather than clearing it to an empty string.
 The UI calls rejected answers "Incorrect", but stores them in FOCC's original
 `uncorrect_answers` array. The saved format remains `.focc/<filename>:tests` JSON.
+Saves use readable, tab-indented JSON with objects and nonempty answer arrays
+on separate lines. Existing files are reformatted only when saved; string values
+still use JSON escapes for embedded newlines.
 
 ## File compatibility
 

@@ -52,6 +52,64 @@ function M.load(source)
   return { source = source, path = path, tests = tests, original = raw }
 end
 
+local function pretty_json(encoded)
+  -- Format encoded JSON, not Lua values, to preserve the encoder's handling
+  -- of nulls, empty arrays/objects, numbers, and escaped string contents.
+  local chunks, depth, quoted, escaped = {}, 0, false, false
+  local function newline()
+    chunks[#chunks + 1] = "\n" .. string.rep("\t", depth)
+  end
+  local function empty_at(i)
+    local opener = encoded:sub(i, i)
+    return (opener == "[" and encoded:sub(i + 1, i + 1) == "]") or (opener == "{" and encoded:sub(i + 1, i + 1) == "}")
+  end
+  local i = 1
+  while i <= #encoded do
+    local char = encoded:sub(i, i)
+    if quoted then
+      chunks[#chunks + 1] = char
+      if escaped then
+        escaped = false
+      elseif char == "\\" then
+        escaped = true
+      elseif char == '"' then
+        quoted = false
+      end
+    elseif char == '"' then
+      quoted = true
+      chunks[#chunks + 1] = char
+    elseif char == "[" or char == "{" then
+      if empty_at(i) then
+        chunks[#chunks + 1] = encoded:sub(i, i + 1)
+        i = i + 1
+      else
+        chunks[#chunks + 1] = char
+        depth = depth + 1
+        newline()
+      end
+    elseif char == "]" or char == "}" then
+      depth = depth - 1
+      newline()
+      chunks[#chunks + 1] = char
+    elseif char == "," then
+      chunks[#chunks + 1] = char
+      newline()
+    elseif char == ":" then
+      chunks[#chunks + 1] = char
+      local next_char = encoded:sub(i + 1, i + 1)
+      if (next_char == "[" or next_char == "{") and not empty_at(i + 1) then
+        newline()
+      else
+        chunks[#chunks + 1] = " "
+      end
+    else
+      chunks[#chunks + 1] = char
+    end
+    i = i + 1
+  end
+  return table.concat(chunks) .. "\n"
+end
+
 function M.save(store)
   M.validate(store.tests)
   assert(read(store.path) == store.original, "FOCC: tests changed outside Neovim. Reload before saving.")
@@ -61,9 +119,9 @@ function M.save(store)
   for _, test in ipairs(store.tests) do
     local copy = vim.deepcopy(test)
     local encoded = vim.json.encode(copy)
-    entries[#entries + 1] = "  " .. encoded
+    entries[#entries + 1] = encoded
   end
-  local data = "[\n" .. table.concat(entries, ",\n") .. "\n]\n"
+  local data = pretty_json("[" .. table.concat(entries, ",") .. "]")
   local temp = store.path .. ".nvim-" .. vim.uv.os_getpid() .. "-" .. vim.uv.hrtime()
   local fd, err = vim.uv.fs_open(temp, "wx", 384)
   assert(fd, err)
