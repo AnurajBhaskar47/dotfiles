@@ -128,7 +128,7 @@ HISTSIZE=10000
 SAVEHIST=10000
 setopt appendhistory
 
-bindkey -s '^F' "rex-sessionizer\n"
+bindkey -s '^X' "rex-sessionizer\n"
 
 addToPathFront() {
     if [[ "$PATH" != *"$1"* ]]; then

@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# Prefer the inherited PATH, with a fallback for GUI-launched Neovim.
+rex_cli="${REX_CLI:-$(command -v rex || true)}"
+if [[ -z "$rex_cli" ]]; then
+    rex_cli="/Applications/Rex Beta.app/Contents/Helpers/Rex Server.rex/Contents/MacOS/rex"
+fi
+rex() { "$rex_cli" "$@"; }
+
+for tool in fzf jq; do
+    command -v "$tool" >/dev/null || { printf 'Required command not found: %s\n' "$tool" >&2; exit 1; }
+done
+
+roots=(
+    "${PROJECTS_DIR:-$HOME/Projects}"
+)
+sessions=$(rex ls --json)
+candidates=$(
+    jq -r '.sessions[] | ["[session] " + (.label | gsub("[\t\r\n]"; " ")), ({kind: "session", session_id: .session_id} | tojson)] | join("\t")' <<<"$sessions"
+    for root in "${roots[@]}"; do
+        [[ -d "$root" ]] || continue
+
+        while IFS= read -r -d '' directory; do
+            jq -nr --arg path "$directory" \
+            '["[project] " + ($path | split("/") | last | gsub("[\t\r\n]"; " ")) + " — " + ($path | gsub("[\t\r\n]"; " ")), ({kind: "project", path: $path} | tojson)] | join("\t")'
+        done < <(find "$root" -mindepth 1 -maxdepth 1 -type d -print0)
+    done
+)
+if [[ -z "$candidates" ]]; then
+    exit 0
+fi
+
+if selected=$(printf '%s\n' "$candidates" | fzf --no-multi --delimiter=$'\t' --with-nth=1 --prompt='Switch to > '); then
+    choice="${selected#*$'\t'}"
+else
+    status=$?
+    # No match, Escape, and Ctrl-C are normal cancellations.
+    case "$status" in
+        1|130) exit 0 ;;
+        *) exit "$status" ;;
+    esac
+fi
+
+if [[ "$(jq -r '.kind' <<<"$choice")" == "session" ]]; then
+    session_id=$(jq -er '.session_id' <<<"$choice")
+else
+    selected=$(jq -er '.path' <<<"$choice")
+    label=$(basename "$selected")
+    session_id=$(jq -r --arg label "$label" '[.sessions[] | select(.label == $label) | .session_id][0] // empty' <<<"$sessions")
+
+    if [[ -z "$session_id" ]]; then
+        created=$(rex new "$label" -c "$selected" --json)
+        session_id=$(jq -er '.session_id' <<<"$created")
+        rex window new -s "$session_id" scratch --focus=false -c "$selected"
+    fi
+fi
+
+# Without REX_CLIENT, Rex can automatically select a single connected app.
+if [[ -n "${REX_CLIENT:-}" ]]; then
+    rex -C "$REX_CLIENT" do session.select session_id="$session_id"
+else
+    rex do session.select session_id="$session_id"
+fi
