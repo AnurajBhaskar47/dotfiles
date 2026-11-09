@@ -14,7 +14,7 @@ return {
           extensions = { "cpp" },
           compile_cmd = { "clang++", "{source_file}", "-std=c++26", "-o", "{file_name}" },
           run_cmd = { "./{file_name}", "{args}" },
-          lint_compile_cmd = { "clang++", "-std=c++26", "-fsyntax-only", "{source_file}", "-I", "{source_file_dir}" },
+          lint_compile_cmd = { "clang++", "-std=c++23", "-fsyntax-only", "{source_file}", "-I", "{source_file_dir}" },
         },
         {
           name = "Python",
