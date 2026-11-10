@@ -20,7 +20,7 @@ return {
           name = "Python",
           extensions = { "py" },
           compile_cmd = false,
-          run_cmd = { "python", "{source_file}", "{args}" },
+          run_cmd = { "python3", "{source_file}", "{args}" },
         },
         {
           name = "Java",
