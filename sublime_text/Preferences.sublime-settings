@@ -6,4 +6,10 @@
 	],
 	"index_files": true,
 	"scroll_context_lines": 8,
+    "rulers": [100],
+	"translate_tabs_to_spaces": true,
+	"tab_size": 4,
+	"detect_indentation": false,
+	"update_check": false,
+
 }
