@@ -12,7 +12,7 @@ return {
         {
           name = "C++",
           extensions = { "cpp" },
-          compile_cmd = { "clang++", "{source_file}", "-std=c++26", "-o", "{file_name}" },
+          compile_cmd = { "clang++", "{source_file}", "-std=c++23", "-o", "{file_name}" },
           run_cmd = { "./{file_name}", "{args}" },
           lint_compile_cmd = { "clang++", "-std=c++23", "-fsyntax-only", "{source_file}", "-I", "{source_file_dir}" },
         },
@@ -37,7 +37,7 @@ return {
       companion = { port = 12345 },
       debug = {
         adapter = "codelldb",
-        compile_cmd = { "clang++", "-std=c++26", "-g", "-O0", "{source_file}", "-o", "{file_name}-debug" },
+        compile_cmd = { "clang++", "-std=c++23", "-g", "-O0", "{source_file}", "-o", "{file_name}-debug" },
         stop_on_entry = true,
       },
     },
