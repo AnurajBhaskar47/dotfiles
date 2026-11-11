@@ -8,5 +8,5 @@ CompileFlags:
 If:
   PathMatch: '.*\.(cpp|cc|cxx|hpp|hh|hxx)$'
 CompileFlags:
-  Add: [-std=c++23]
+  Add: [-std=c++23, -Wall]
 
